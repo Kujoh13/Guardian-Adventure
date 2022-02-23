@@ -1,0 +1,30 @@
+# depslib dependency file v1.0
+1645545475 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\main.cpp
+	"BasicFunction.h"
+	"GameObject.h"
+
+1645459910 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.cpp
+	"BasicFunction.h"
+
+1645552143 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.h
+	<bits/stdc++.h>
+	<SDL.h>
+	<Windows.h>
+	<string.h>
+	<SDL_image.h>
+	<SDL_audio.h>
+	<SDL_ttf.h>
+
+1645552172 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\gameobject.cpp
+	"GameObject.h"
+
+1645546759 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\gameobject.h
+	"BasicFunction.h"
+
+1645552156 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
+	"game_map.h"
+
+1645552128 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
+	"BasicFunction.h"
+	"GameObject.h"
+
