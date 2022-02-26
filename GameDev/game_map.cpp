@@ -3,47 +3,98 @@
 game_map::game_map()
 {
     Map_Sheet = NULL;
+    background = NULL;
+    Num_Block = 1;
+    Map_X = 100;
+    Map_Y = 20;
+    while(Block.size()) Block.pop_back();
 }
 game_map::~game_map()
 {
-    SDL_DestroyTexture(Map_Sheet);
+    SDL_FreeSurface(Map_Sheet);
+    SDL_DestroyTexture(background);
 }
 
-bool game_map::loadMap(std::string path, SDL_Renderer* renderer)
+Uint32 getpixel(SDL_Surface *surface, int x, int y)
 {
+    int bpp = surface->format->BytesPerPixel;
+    /* Here p is the address to the pixel we want to retrieve */
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+switch (bpp)
+{
+    case 1:
+        return *p;
+        break;
+
+    case 2:
+        return *(Uint16 *)p;
+        break;
+
+    case 3:
+        if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            return p[0] << 16 | p[1] << 8 | p[2];
+        else
+            return p[0] | p[1] << 8 | p[2] << 16;
+            break;
+
+        case 4:
+            return *(Uint32 *)p;
+            break;
+
+        default:
+            return 0;       /* shouldn't happen, but avoids warnings */
+      }
+}
+
+bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
+{
+    Map_Sheet = IMG_Load((path + "/level_" + int2str(level) + "/level.png").c_str());
+
     SDL_Texture* newTexture;
 
-    SDL_Surface* loadedSurface = IMG_Load(path.c_str());
+    SDL_Surface* loadedSurface = IMG_Load((path + "/level_" + int2str(level) + "/background.png").c_str());
 
-    if(loadedSurface == NULL)
-    {
-        printf( "Unable to load image %s! SDL_image Error\n");
-    }
-    else
-    {
-        //Create texture from surface pixels
-        newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface );
-        if(newTexture == NULL)
-        {
-            printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
-        }
+    newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+
+    background = newTexture;
+
+    SDL_FreeSurface(loadedSurface);
+
+    for(int i = 0; i < Num_Block; i++){
+
+        SDL_Surface* loadedSurface = IMG_Load((path + "/level_" + int2str(level) + "/block_" + int2str(i) + ".png").c_str());
+
+        Block.push_back(SDL_CreateTextureFromSurface(renderer, loadedSurface));
 
         SDL_FreeSurface(loadedSurface);
     }
 
-    Map_Sheet = newTexture;
 
-    return Map_Sheet != NULL;
+    return Map_Sheet != NULL && background != NULL;
 }
 
 void game_map::render(SDL_Renderer* ren){
-    SDL_Rect rect = {0, 0, TILE_SIZE, TILE_SIZE};
+    //std::cout << Num_Block << '\n';
+
+    SDL_Rect rect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+
+    SDL_RenderCopy(ren, background, NULL, &rect);
+
+    SDL_Color rgb;
+    Uint32 data;
+
+    rect = {0, 0, TILE_SIZE, TILE_SIZE};
     for(int i = 0; i < Map_X; i++)
         for(int j = 0; j < Map_Y; j++)
         {
-            if()
-            rect.x = i * TILE_SIZE;
-            rect.y = j * TILE_SIZE;
-            SDL_RenderCopy()
+            data = getpixel(Map_Sheet, i, j);
+            SDL_GetRGB(data, Map_Sheet->format, &rgb.r, &rgb.g, &rgb.b);
+            //std::cout << rect.x << ' ' << rect.y << '\n';
+            if(rgb.g == 255){
+                rect.x = i * TILE_SIZE;
+                rect.y = j * TILE_SIZE;
+                SDL_RenderCopy(ren, Block[0], NULL, &rect);
+            }
         }
 }

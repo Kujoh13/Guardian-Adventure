@@ -1,6 +1,8 @@
 
 #include "BasicFunction.h"
 #include "GameObject.h"
+#include "game_map.h"
+#include "Screen.h"
 
 using namespace std;
 
@@ -17,6 +19,7 @@ void logSDLError(std::ostream& os,
 }
 
 const string WINDOW_TITLE = "Game SDL";
+static std::vector<GameObject> object;
 
 void initSDL(SDL_Window* &window, SDL_Renderer* &renderer);
 
@@ -39,9 +42,10 @@ void initSDL(SDL_Window* &window, SDL_Renderer* &renderer){
 }
 
 GameObject gBackground;
-bool loadBackground()
+game_map MAP;
+bool load(int level)
 {
-    bool ret = gBackground.loadImage("img/flag.png", gRenderer);
+    bool ret = MAP.loadMap("img/", gRenderer, level);
     return ret;
 }
 
@@ -59,18 +63,25 @@ void close()
     SDL_Quit();
 }
 
+void startScreen(){
+
+}
+
 int main(int argc, char* argv[]){
 
 
     initSDL(gWindow, gRenderer);
 
-    if(loadBackground() == false)
-        return -1;
+    Screen scr;
+    scr.loadTexture(gRenderer);
 
-    bool isRunning = true;
+    int isRunning = 1;
+
+    load(1);
 
     while(isRunning)
     {
+
         while(SDL_PollEvent(&gEvent))
         {
             if(gEvent.type == SDL_QUIT)
@@ -79,11 +90,25 @@ int main(int argc, char* argv[]){
             }
         }
 
-        SDL_RenderClear(gRenderer);
+        int lastTime = 0;
 
-        gBackground.render(gRenderer, NULL);
+        int currentTime = SDL_GetTicks();
 
-        SDL_RenderPresent(gRenderer);
+        if(currentTime - lastTime >= 1){
+
+            SDL_RenderClear(gRenderer);
+
+            if(isRunning == 1){
+                scr.startScreen(gRenderer);
+            }
+
+            //MAP.render(gRenderer);
+
+            SDL_RenderPresent(gRenderer);
+
+            lastTime = currentTime;
+        }
+
     }
     close();
 

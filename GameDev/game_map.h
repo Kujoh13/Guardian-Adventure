@@ -9,13 +9,17 @@ class game_map
 public:
     game_map();
     ~game_map();
-    bool loadMap(std::string path, SDL_Renderer* renderer);
+    bool loadMap(std::string path, SDL_Renderer* renderer, int level);
     void render(SDL_Renderer* ren);
 
 protected:
-    SDL_Texture* Block[2];
-    SDL_Texture* Map_Sheet;
+    std::vector<SDL_Texture*> Block;
+    SDL_Surface* Map_Sheet;
+    SDL_Texture* background;
     int Map_X, Map_Y;
+    int Num_Block;
 };
+
+Uint32 getpixel(SDL_Surface *surface, int x, int y);
 
 #endif // GAME_MAP_H

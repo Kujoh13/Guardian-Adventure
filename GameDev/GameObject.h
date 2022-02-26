@@ -16,6 +16,20 @@ public:
     void render(SDL_Renderer* ren);
     void Free();
 
+    int getX() {return rect.x;}
+    int getY() {return rect.y;}
+    int getW() {return rect.w;}
+    int getH() {return rect.h;}
+    int getVelX() {return velX;}
+    int getVelY() {return velY;}
+
+    void setX(int x) {rect.x = x;}
+    void setY(int y) {rect.y = y;}
+    void setW(int w) {rect.w = w;}
+    void setH(int h) {rect.h = h;}
+    void setVelX(int _velX) {velX = _velX;}
+    void setVelY(int _velY) {velY = _velY;}
+
 protected:
     SDL_Texture* pObject;
     SDL_Rect rect;
