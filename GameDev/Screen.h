@@ -11,8 +11,9 @@ public:
     ~Screen();
     void loadTexture(SDL_Renderer* renderer);
     void startScreen(SDL_Renderer* renderer);
-    void levelSelection();
-    void loadingScreen();
+    void levelSelection(SDL_Renderer* renderer);
+    void checkExit(int x, int y, int &isRunning);
+    void checkStart(int x, int y, int &isRunning);
 
 protected:
     GameObject start_screen;
@@ -20,7 +21,7 @@ protected:
     GameObject start_screen_title1;
     GameObject start_button[2];
     GameObject exit_button[2];
-    int curAlpha = 0;
+    int curAlpha;
 };
 
 

@@ -3,7 +3,7 @@
 
 Screen::Screen()
 {
-
+    curAlpha = 0;
 }
 
 Screen::~Screen()
@@ -92,5 +92,38 @@ void Screen::startScreen(SDL_Renderer* renderer)
 
 
     if(curAlpha < 255 && start_screen_title1.getY() == 180) curAlpha += 5;
+
+}
+
+void Screen::checkExit(int x, int y, int &isRunning)
+{
+
+    if(curAlpha == 255)
+    {
+
+        if(x >= exit_button[0].getX() &&
+           y >= exit_button[0].getY() &&
+           x <= exit_button[0].getX() + exit_button[0].getW() &&
+           y <= exit_button[0].getY() + exit_button[0].getH())
+            isRunning = 0;
+    }
+}
+
+void Screen::checkStart(int x, int y, int &isRunning)
+{
+
+    if(curAlpha == 255)
+    {
+        //std::cout << "Start\n";
+        if(x >= start_button[0].getX() &&
+           y >= start_button[0].getY() &&
+           x <= start_button[0].getX() + start_button[0].getW() &&
+           y <= start_button[0].getY() + start_button[0].getH())
+        isRunning = 2;
+    }
+}
+
+void Screen::levelSelection(SDL_Renderer* renderer)
+{
 
 }

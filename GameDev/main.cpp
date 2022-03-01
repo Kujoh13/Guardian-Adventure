@@ -63,10 +63,6 @@ void close()
     SDL_Quit();
 }
 
-void startScreen(){
-
-}
-
 int main(int argc, char* argv[]){
 
 
@@ -76,17 +72,26 @@ int main(int argc, char* argv[]){
     scr.loadTexture(gRenderer);
 
     int isRunning = 1;
+    int currentLevel = 1;
 
     load(1);
 
     while(isRunning)
     {
-
         while(SDL_PollEvent(&gEvent))
         {
+
             if(gEvent.type == SDL_QUIT)
             {
                 isRunning = 0;
+            }
+            if(gEvent.type == SDL_MOUSEBUTTONDOWN && gEvent.button.button == SDL_BUTTON_LEFT){
+
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                scr.checkExit(x, y, isRunning);
+                scr.checkStart(x, y, isRunning);
+
             }
         }
 
@@ -100,6 +105,11 @@ int main(int argc, char* argv[]){
 
             if(isRunning == 1){
                 scr.startScreen(gRenderer);
+            }
+            else if(isRunning == 2){
+                //scr.levelSelection(gRenderer);
+                MAP.setNumBlock(4);
+                MAP.render(gRenderer);
             }
 
             //MAP.render(gRenderer);

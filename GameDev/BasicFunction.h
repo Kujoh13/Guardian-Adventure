@@ -20,5 +20,12 @@ const int SCREEN_BPP = 32;
 //Map
 const int TILE_SIZE = 36;
 std::string int2str(int num);
+bool operator == (SDL_Color a, SDL_Color b);
+
+const SDL_Color red = {255, 0, 0, 255};
+const SDL_Color blue = {0, 0, 255, 255};
+const SDL_Color green = {0, 255, 0, 255};
+const SDL_Color black = {0, 0, 0, 255};
+const SDL_Color white = {255, 255, 255, 255};
 
 #endif

@@ -11,13 +11,19 @@ public:
     ~game_map();
     bool loadMap(std::string path, SDL_Renderer* renderer, int level);
     void render(SDL_Renderer* ren);
+    void setNumBlock(int _NumBlock);
+    int getNumBlock(int _NumBlock);
+    void setNumBush(int _NumBush);
+    int getNumBush(int _NumBush);
 
 protected:
     std::vector<SDL_Texture*> Block;
+    std::vector<SDL_Texture*> Bush;
     SDL_Surface* Map_Sheet;
     SDL_Texture* background;
     int Map_X, Map_Y;
     int Num_Block;
+    int Num_Bush;
 };
 
 Uint32 getpixel(SDL_Surface *surface, int x, int y);
