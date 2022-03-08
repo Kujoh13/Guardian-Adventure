@@ -4,7 +4,7 @@ game_map::game_map()
 {
     Map_Sheet = NULL;
     background = NULL;
-    Map_X = 100;
+    Map_X = 300;
     Map_Y = 20;
     Num_Block = 4;
     Num_Bush = 2;
@@ -98,11 +98,24 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
         SDL_FreeSurface(loadedSurface);
     }
 
+    SDL_Color rgb;
+    Uint32 data;
+
+    for(int i = 0; i < Map_Y; i++)
+        for(int j = 0; j < Map_X; j++)
+        {
+            data = getpixel(Map_Sheet, j, i);
+            SDL_GetRGB(data, Map_Sheet->format, &rgb.r, &rgb.g, &rgb.b);
+
+            if(rgb == white || rgb == green) info[i][j] = 1;
+            else info[i][j] = 0;
+        }
+
 
     return Map_Sheet != NULL && background != NULL;
 }
 
-void game_map::render(SDL_Renderer* ren){
+void game_map::render(SDL_Renderer* ren, int view){
 
     SDL_Rect rect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
@@ -119,32 +132,27 @@ void game_map::render(SDL_Renderer* ren){
         {
             data = getpixel(Map_Sheet, j, i);
             SDL_GetRGB(data, Map_Sheet->format, &rgb.r, &rgb.g, &rgb.b);
-            //std::cout << rect.x << ' ' << rect.y << '\n';
+
+            rect.x = j * TILE_SIZE - view;
+            rect.y = i * TILE_SIZE;
+
             if(rgb == white){
-                rect.x = j * TILE_SIZE;
-                rect.y = i * TILE_SIZE;
                 rect.w = TILE_SIZE;
                 rect.h = TILE_SIZE;
                 SDL_RenderCopy(ren, Block[2], NULL, &rect);
             }
             else if(rgb == green){
-                rect.x = j * TILE_SIZE;
-                rect.y = i * TILE_SIZE;
                 rect.w = TILE_SIZE;
                 rect.h = TILE_SIZE;
                 numGrass++;
                 SDL_RenderCopy(ren, Block[numGrass%2], NULL, &rect);
             }
             else if(rgb == blue){
-                rect.x = j * TILE_SIZE;
-                rect.y = i * TILE_SIZE;
                 rect.w = 2 * TILE_SIZE;
                 rect.h = 2 * TILE_SIZE;
                 SDL_RenderCopy(ren, Bush[0], NULL, &rect);
             }
             else if(rgb == red){
-                rect.x = j * TILE_SIZE;
-                rect.y = i * TILE_SIZE;
                 rect.w = 4 * TILE_SIZE;
                 rect.h = 4 * TILE_SIZE;
                 SDL_RenderCopy(ren, Bush[1], NULL, &rect);

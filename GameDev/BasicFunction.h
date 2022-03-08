@@ -28,4 +28,14 @@ const SDL_Color green = {0, 255, 0, 255};
 const SDL_Color black = {0, 0, 0, 255};
 const SDL_Color white = {255, 255, 255, 255};
 
+//Character
+const double gravity = 3;
+const double MAX_FALL_SPEED = 25;
+const double MAX_RUN_SPEED = 10;
+
+const int numCharacter = 1;
+const int charSize = 240;
+const int charWidth = 40;
+const int charHeight = 85;
+
 #endif

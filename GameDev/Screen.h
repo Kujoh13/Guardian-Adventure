@@ -12,8 +12,8 @@ public:
     void loadTexture(SDL_Renderer* renderer);
     void startScreen(SDL_Renderer* renderer);
     void levelSelection(SDL_Renderer* renderer);
-    void checkExit(int x, int y, int &isRunning);
-    void checkStart(int x, int y, int &isRunning);
+    void checkExit(int x, int y, int &isRunning, SDL_Event event);
+    void checkStart(int x, int y, int &isRunning, SDL_Event event);
 
 protected:
     GameObject start_screen;

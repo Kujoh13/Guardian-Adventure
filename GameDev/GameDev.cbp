@@ -36,6 +36,8 @@
 		</Compiler>
 		<Unit filename="BasicFunction.cpp" />
 		<Unit filename="BasicFunction.h" />
+		<Unit filename="Character.cpp" />
+		<Unit filename="Character.h" />
 		<Unit filename="GameObject.cpp" />
 		<Unit filename="GameObject.h" />
 		<Unit filename="Screen.cpp" />

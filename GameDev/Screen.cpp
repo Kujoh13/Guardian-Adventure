@@ -30,8 +30,8 @@ void Screen::loadTexture(SDL_Renderer* renderer)
     start_screen_title0.setY(-200);
     start_screen_title1.setX(15);
     start_screen_title1.setY(721);
-    start_screen_title0.setVelY(5);
-    start_screen_title1.setVelY(-10);
+    start_screen_title0.setVelY(13);
+    start_screen_title1.setVelY(-20 );
 
     start_button[0].setX(460);
     start_button[0].setY(380);
@@ -91,16 +91,15 @@ void Screen::startScreen(SDL_Renderer* renderer)
     }
 
 
-    if(curAlpha < 255 && start_screen_title1.getY() == 180) curAlpha += 5;
+    if(curAlpha < 255 && start_screen_title1.getY() == 180) curAlpha += 17;
 
 }
 
-void Screen::checkExit(int x, int y, int &isRunning)
+void Screen::checkExit(int x, int y, int &isRunning, SDL_Event event)
 {
-
+    if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
     if(curAlpha == 255)
     {
-
         if(x >= exit_button[0].getX() &&
            y >= exit_button[0].getY() &&
            x <= exit_button[0].getX() + exit_button[0].getW() &&
@@ -109,9 +108,9 @@ void Screen::checkExit(int x, int y, int &isRunning)
     }
 }
 
-void Screen::checkStart(int x, int y, int &isRunning)
+void Screen::checkStart(int x, int y, int &isRunning, SDL_Event event)
 {
-
+    if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
     if(curAlpha == 255)
     {
         //std::cout << "Start\n";
@@ -119,7 +118,7 @@ void Screen::checkStart(int x, int y, int &isRunning)
            y >= start_button[0].getY() &&
            x <= start_button[0].getX() + start_button[0].getW() &&
            y <= start_button[0].getY() + start_button[0].getH())
-        isRunning = 2;
+        isRunning = 3;
     }
 }
 

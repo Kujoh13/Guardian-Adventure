@@ -1,14 +1,15 @@
 # depslib dependency file v1.0
-1646101899 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\main.cpp
+1646672386 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\main.cpp
 	"BasicFunction.h"
 	"GameObject.h"
 	"game_map.h"
 	"Screen.h"
+	"Character.h"
 
-1646101520 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.cpp
+1646649469 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.cpp
 	"BasicFunction.h"
 
-1646101520 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.h
+1646666369 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.h
 	<bits/stdc++.h>
 	<SDL.h>
 	<Windows.h>
@@ -22,17 +23,25 @@
 1645810003 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\gameobject.h
 	"BasicFunction.h"
 
-1646103107 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
+1646666342 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
 	"game_map.h"
 
-1646102670 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
+1646673195 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
 	"BasicFunction.h"
 	"GameObject.h"
 
-1645985298 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.cpp
+1646560235 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.cpp
 	"Screen.h"
 
-1645985226 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.h
+1646333523 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.h
 	"BasicFunction.h"
 	"GameObject.h"
+
+1646672733 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.cpp
+	"Character.h"
+
+1646670017 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.h
+	"GameObject.h"
+	"BasicFunction.h"
+	"game_map.h"
 

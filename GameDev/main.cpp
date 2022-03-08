@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "game_map.h"
 #include "Screen.h"
+#include "Character.h"
 
 using namespace std;
 
@@ -42,10 +43,12 @@ void initSDL(SDL_Window* &window, SDL_Renderer* &renderer){
 }
 
 GameObject gBackground;
-game_map MAP;
+game_map* MAP = new game_map;
+
+
 bool load(int level)
 {
-    bool ret = MAP.loadMap("img/", gRenderer, level);
+    bool ret = MAP->loadMap("img/", gRenderer, level);
     return ret;
 }
 
@@ -63,6 +66,8 @@ void close()
     SDL_Quit();
 }
 
+int view;
+Character _character[numCharacter];
 int main(int argc, char* argv[]){
 
 
@@ -72,47 +77,78 @@ int main(int argc, char* argv[]){
     scr.loadTexture(gRenderer);
 
     int isRunning = 1;
+    /** Notes:
+    1. Start Screen
+    2. Level Selection
+    3. In a level
+    **/
     int currentLevel = 1;
+    int currentCharacter = 0;
 
-    load(1);
+    if(!load(1))
+        return -1;
+
+    for(int i = 0; i < numCharacter; i++){
+        if(!_character[i].loadCharacter("Character/" + int2str(i), gRenderer, i))
+            return -1;
+    }
+
+    int lastTime = 0, currentTime = 0;
+
 
     while(isRunning)
     {
-        while(SDL_PollEvent(&gEvent))
-        {
 
-            if(gEvent.type == SDL_QUIT)
+        currentTime = SDL_GetTicks();
+
+        if(currentTime - lastTime >= 33){
+
+            bool idle = true;
+            while(SDL_PollEvent(&gEvent))
             {
-                isRunning = 0;
+
+                if(gEvent.type == SDL_QUIT)
+                {
+                    isRunning = 0;
+                }
+                if(isRunning == 1){
+                    if(gEvent.type == SDL_MOUSEBUTTONDOWN && gEvent.button.button == SDL_BUTTON_LEFT){
+                        int x, y;
+                        SDL_GetMouseState(&x, &y);
+                        scr.checkExit(x, y, isRunning, gEvent);
+                        scr.checkStart(x, y, isRunning, gEvent);
+                    }
+                }
+                else if(isRunning == 3){
+                    const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
+                    _character[currentCharacter].handleInput(gEvent, keyboard_state_array);
+                    idle = false;
+
+                }
+
             }
-            if(gEvent.type == SDL_MOUSEBUTTONDOWN && gEvent.button.button == SDL_BUTTON_LEFT){
 
-                int x, y;
-                SDL_GetMouseState(&x, &y);
-                scr.checkExit(x, y, isRunning);
-                scr.checkStart(x, y, isRunning);
-
-            }
-        }
-
-        int lastTime = 0;
-
-        int currentTime = SDL_GetTicks();
-
-        if(currentTime - lastTime >= 1){
+            if(idle) _character[currentCharacter].setStatus(0);
 
             SDL_RenderClear(gRenderer);
 
             if(isRunning == 1){
                 scr.startScreen(gRenderer);
             }
-            else if(isRunning == 2){
+            else if(isRunning == 3){
                 //scr.levelSelection(gRenderer);
-                MAP.setNumBlock(4);
-                MAP.render(gRenderer);
-            }
+                MAP->setNumBlock(4);
 
-            //MAP.render(gRenderer);
+                _character[currentCharacter].tick(MAP);
+
+                if(_character[currentCharacter].getX() >= SCREEN_WIDTH / 2)
+                    view = _character[currentCharacter].getX() - (SCREEN_WIDTH / 2);
+                else view = 0;
+
+                MAP->render(gRenderer, view);
+                _character[currentCharacter].show(gRenderer, view);
+
+            }
 
             SDL_RenderPresent(gRenderer);
 
