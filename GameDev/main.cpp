@@ -4,43 +4,17 @@
 #include "game_map.h"
 #include "Screen.h"
 #include "Character.h"
+#include "Mob.h"
+#include "Projectile.h"
 
 using namespace std;
 
 void logSDLError(std::ostream& os,
                  const std::string &msg, bool fatal = false);
 
-void logSDLError(std::ostream& os,
-                 const std::string &msg, bool fatal){
-    os << msg << " Error: " << SDL_GetError() << std::endl;
-    if (fatal) {
-        SDL_Quit();
-        exit(1);
-    }
-}
-
 const string WINDOW_TITLE = "Game SDL";
-static std::vector<GameObject> object;
 
 void initSDL(SDL_Window* &window, SDL_Renderer* &renderer);
-
-void initSDL(SDL_Window* &window, SDL_Renderer* &renderer){
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-        logSDLError(std::cout, "SDL_Init", true);
-
-    window = SDL_CreateWindow(WINDOW_TITLE.c_str(), SDL_WINDOWPOS_CENTERED,
-       SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-
-    if (window == nullptr) logSDLError(std::cout, "CreateWindow", true);
-
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED |
-                                              SDL_RENDERER_PRESENTVSYNC);
-
-    if (renderer == nullptr) logSDLError(std::cout, "CreateRenderer", true);
-
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-    SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-}
 
 GameObject gBackground;
 game_map* MAP = new game_map;
@@ -48,7 +22,7 @@ game_map* MAP = new game_map;
 
 bool load(int level)
 {
-    bool ret = MAP->loadMap("img/", gRenderer, level);
+    bool ret = MAP->loadMap("img", gRenderer, level);
     return ret;
 }
 
@@ -68,8 +42,13 @@ void close()
 
 int view;
 Character _character[numCharacter];
-int main(int argc, char* argv[]){
 
+std::vector<Mob>* vMob;
+std::vector<Projectile> vProjectile;
+
+SDL_Texture* pr[1];
+
+int main(int argc, char* argv[]){
 
     initSDL(gWindow, gRenderer);
 
@@ -88,9 +67,27 @@ int main(int argc, char* argv[]){
     if(!load(1))
         return -1;
 
+    Mob mob;
+
+    mob.setWeapon(1);
+
+    if(!mob.loadMob("img/Level_1/0", gRenderer))
+        return -1;
+
     for(int i = 0; i < numCharacter; i++){
         if(!_character[i].loadCharacter("Character/" + int2str(i), gRenderer, i))
             return -1;
+    }
+
+    for(int i = 0; i < 1; i++){
+        std::string path = "img/Projectile/" + int2str(i) + ".png";
+
+        SDL_Surface* sf = IMG_Load(path.c_str());
+        if(sf == NULL) return -1;
+
+        pr[i] = SDL_CreateTextureFromSurface(gRenderer, sf);
+
+        SDL_FreeSurface(sf);
     }
 
     int lastTime = 0, currentTime = 0;
@@ -120,15 +117,17 @@ int main(int argc, char* argv[]){
                     }
                 }
                 else if(isRunning == 3){
-                    const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
-                    _character[currentCharacter].handleInput(gEvent, keyboard_state_array);
+                    _character[currentCharacter].handleInput(gEvent);
                     idle = false;
 
                 }
 
             }
 
-            if(idle) _character[currentCharacter].setStatus(0);
+            if(idle)
+                _character[currentCharacter].setStatus(0);
+            if(!_character[currentCharacter].getAttack())
+                _character[currentCharacter].setStatus(3);
 
             SDL_RenderClear(gRenderer);
 
@@ -140,14 +139,39 @@ int main(int argc, char* argv[]){
                 MAP->setNumBlock(4);
 
                 _character[currentCharacter].tick(MAP);
+                mob.tick(MAP, vProjectile, _character[currentCharacter].getRect());
+
+                if(vProjectile.size())
+                for(int i = vProjectile.size() - 1; i >= 0 ; i--){
+                    vProjectile[i].tick();
+                    if(vProjectile[i].done())
+                    {
+                        swap(vProjectile[i], vProjectile.back());
+                        vProjectile.pop_back();
+                    }
+                }
 
                 if(_character[currentCharacter].getX() >= SCREEN_WIDTH / 2)
                     view = _character[currentCharacter].getX() - (SCREEN_WIDTH / 2);
                 else view = 0;
 
-                MAP->render(gRenderer, view);
-                _character[currentCharacter].show(gRenderer, view);
 
+
+                MAP->render(gRenderer, view);
+
+                mob.show(gRenderer, view);
+                _character[currentCharacter].show(gRenderer, view);
+                for(int i = 0; i < vProjectile.size(); i++){
+
+                    SDL_Rect tRect = vProjectile[i].getRect();
+                    tRect.x -= view;
+
+                    SDL_Rect nRect = vProjectile[i].getHitBox(view);
+
+                    SDL_RenderDrawRect(gRenderer, &nRect);
+
+                    SDL_RenderCopyEx(gRenderer, pr[vProjectile[i].getId()], NULL, &tRect, vProjectile[i].getAngle(), NULL, SDL_FLIP_NONE);
+                }
             }
 
             SDL_RenderPresent(gRenderer);
@@ -159,4 +183,31 @@ int main(int argc, char* argv[]){
     close();
 
     return 0;
+}
+
+void initSDL(SDL_Window* &window, SDL_Renderer* &renderer){
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+        logSDLError(std::cout, "SDL_Init", true);
+
+    window = SDL_CreateWindow(WINDOW_TITLE.c_str(), SDL_WINDOWPOS_CENTERED,
+       SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+
+    if (window == nullptr) logSDLError(std::cout, "CreateWindow", true);
+
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED |
+                                              SDL_RENDERER_PRESENTVSYNC);
+
+    if (renderer == nullptr) logSDLError(std::cout, "CreateRenderer", true);
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+}
+
+void logSDLError(std::ostream& os,
+                 const std::string &msg, bool fatal){
+    os << msg << " Error: " << SDL_GetError() << std::endl;
+    if (fatal) {
+        SDL_Quit();
+        exit(1);
+    }
 }

@@ -47,7 +47,7 @@ void Screen::loadTexture(SDL_Renderer* renderer)
 
 void Screen::startScreen(SDL_Renderer* renderer)
 {
-    start_screen.render(renderer);
+    start_screen.render(renderer, 0);
 
     if(start_screen_title0.getY() < 5)
         start_screen_title0.setY(std::min(5, start_screen_title0.getY() +
@@ -57,9 +57,9 @@ void Screen::startScreen(SDL_Renderer* renderer)
         start_screen_title1.setY(std::max(180, start_screen_title1.getY() +
                                      start_screen_title1.getVelY()));
 
-    start_screen_title0.render(renderer);
+    start_screen_title0.render(renderer, 0);
 
-    start_screen_title1.render(renderer);
+    start_screen_title1.render(renderer, 0);
 
 
     int x, y;
@@ -72,10 +72,10 @@ void Screen::startScreen(SDL_Renderer* renderer)
            y >= start_button[0].getY() &&
            x <= start_button[0].getX() + start_button[0].getW() &&
            y <= start_button[0].getY() + start_button[0].getH())
-            start_button[1].render(renderer);
+            start_button[1].render(renderer, 0);
 
         else
-            start_button[0].render(renderer);
+            start_button[0].render(renderer, 0);
     }
 
     if(curAlpha == 255){
@@ -84,10 +84,10 @@ void Screen::startScreen(SDL_Renderer* renderer)
            y >= exit_button[0].getY() &&
            x <= exit_button[0].getX() + exit_button[0].getW() &&
            y <= exit_button[0].getY() + exit_button[0].getH())
-            exit_button[1].render(renderer);
+            exit_button[1].render(renderer, 0);
 
         else
-            exit_button[0].render(renderer);
+            exit_button[0].render(renderer, 0);
     }
 
 

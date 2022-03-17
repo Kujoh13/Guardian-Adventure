@@ -40,6 +40,10 @@
 		<Unit filename="Character.h" />
 		<Unit filename="GameObject.cpp" />
 		<Unit filename="GameObject.h" />
+		<Unit filename="Mob.cpp" />
+		<Unit filename="Mob.h" />
+		<Unit filename="Projectile.cpp" />
+		<Unit filename="Projectile.h" />
 		<Unit filename="Screen.cpp" />
 		<Unit filename="Screen.h" />
 		<Unit filename="game_map.cpp" />

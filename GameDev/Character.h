@@ -11,26 +11,27 @@ public:
     Character();
     ~Character();
     void show(SDL_Renderer* renderer, int view);
-    void handleInput(SDL_Event event, const Uint8 *keyboard_state_array);
+    void handleInput(SDL_Event event);
     bool loadCharacter(std::string path, SDL_Renderer* renderer, int _id);
     void tick(game_map* MAP);
     void collisionX(game_map* MAP);
     void collisionY(game_map* MAP);
     void drawIdle(SDL_Renderer* renderer, int view);
     void drawMove(SDL_Renderer* renderer, int view);
-    void drawAttack(SDL_Renderer* renderer);
-    void drawDied(SDL_Renderer* renderer);
-    void drawVictory(SDL_Renderer* renderer);
+    void drawAttack(SDL_Renderer* renderer, int view);
+    void drawDied(SDL_Renderer* renderer, int view);
+    void drawVictory(SDL_Renderer* renderer, int view);
     void setStatus(int _status);
     int getStatus();
+    bool getAttack();
 
 protected:
-    SDL_Texture* idleAnimation;
-    SDL_Texture* moveAnimation;
-    SDL_Texture* attackAnimation;
-    SDL_Texture* diedAnimation;
+    SDL_Texture* idleAnimation[2];
+    SDL_Texture* moveAnimation[2];
+    SDL_Texture* attackAnimation[2];
+    SDL_Texture* diedAnimation[2];
     SDL_Texture* victoryAnimation;
-    SDL_Texture* jump;
+    SDL_Texture* jump[2];
 
     std::pair<int, int> _idle;
     std::pair<int, int> _move;
@@ -55,6 +56,9 @@ protected:
 
     bool leftP = false, rightP = false;
     bool pressed[300];
+    bool finishAttack;
+    int nextAttack, framePerAttack;
+    bool facing;
 };
 
 #endif // CHARACTER_H_

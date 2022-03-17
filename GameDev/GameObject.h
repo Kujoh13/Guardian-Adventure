@@ -13,7 +13,7 @@ public:
     SDL_Texture* getObject() {return pObject;}
 
     bool loadImage(std::string path, SDL_Renderer* renderer);
-    void render(SDL_Renderer* ren);
+    void render(SDL_Renderer* ren, int view);
     void Free();
 
     int getX() {return rect.x;}

@@ -27,6 +27,8 @@ const SDL_Color blue = {0, 0, 255, 255};
 const SDL_Color green = {0, 255, 0, 255};
 const SDL_Color black = {0, 0, 0, 255};
 const SDL_Color white = {255, 255, 255, 255};
+const SDL_Color yellow = {255, 255, 0, 255};
+const SDL_Color pink = {255, 0, 255, 255};
 
 //Character
 const double gravity = 3;
@@ -37,5 +39,13 @@ const int numCharacter = 1;
 const int charSize = 240;
 const int charWidth = 40;
 const int charHeight = 85;
+
+//Projectiles
+const int numProjectile = 1;
+const double pi = acos(-1);
+//double gAngle(SDL_Point A, SDL_Point B)
+//{
+//    return (A.x * B.x + )
+//}
 
 #endif

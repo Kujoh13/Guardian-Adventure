@@ -20,20 +20,20 @@ game_map::~game_map()
 Uint32 getpixel(SDL_Surface *surface, int x, int y)
 {
     int bpp = surface->format->BytesPerPixel;
-    /* Here p is the address to the pixel we want to retrieve */
+
     Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 
-switch (bpp)
-{
-    case 1:
-        return *p;
-        break;
+    switch (bpp)
+    {
+        case 1:
+            return *p;
+            break;
 
-    case 2:
-        return *(Uint16 *)p;
-        break;
+        case 2:
+            return *(Uint16 *)p;
+            break;
 
-    case 3:
+        case 3:
         if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
             return p[0] << 16 | p[1] << 8 | p[2];
         else
@@ -45,7 +45,7 @@ switch (bpp)
             break;
 
         default:
-            return 0;       /* shouldn't happen, but avoids warnings */
+            return 0;
       }
 }
 
@@ -77,6 +77,18 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
     newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 
     background = newTexture;
+
+    loadedSurface = IMG_Load((path + "/castle.png").c_str());
+
+    newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+
+    castle = newTexture;
+
+    loadedSurface = IMG_Load((path + "/flag.png").c_str());
+
+    newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+
+    flag = newTexture;
 
     SDL_FreeSurface(loadedSurface);
 
@@ -156,6 +168,17 @@ void game_map::render(SDL_Renderer* ren, int view){
                 rect.w = 4 * TILE_SIZE;
                 rect.h = 4 * TILE_SIZE;
                 SDL_RenderCopy(ren, Bush[1], NULL, &rect);
+            }
+            else if(rgb == yellow){
+                rect.w = 23 * TILE_SIZE;
+                rect.h = 18 * TILE_SIZE;
+                SDL_RenderCopy(ren, castle, NULL, &rect);
+            }
+            else if(rgb == pink){
+                rect.w = 2 * TILE_SIZE;
+                rect.h = 5 * TILE_SIZE;
+                victory = j * TILE_SIZE;
+                SDL_RenderCopy(ren, flag, NULL, &rect);
             }
         }
 }

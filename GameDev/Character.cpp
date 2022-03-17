@@ -6,8 +6,11 @@ Character::Character()
     frame = 0;
     status = 0;
     id = 0;
-    isFalling = 1;
-    isJumping = 0;
+    isFalling = true;
+    isJumping = false;
+    finishAttack = true;
+    nextAttack = 0;
+    facing = 0;
 
     _idle = {0, 0};
     _move = {0, 0};
@@ -25,12 +28,14 @@ Character::~Character()
     _victory = {0, 0};
 
     frame = 0;
-    SDL_DestroyTexture(jump);
-    SDL_DestroyTexture(idleAnimation);
-    SDL_DestroyTexture(moveAnimation);
-    SDL_DestroyTexture(diedAnimation);
+    for(int i = 0; i <= 1; i++){
+        SDL_DestroyTexture(jump[i]);
+        SDL_DestroyTexture(idleAnimation[i]);
+        SDL_DestroyTexture(moveAnimation[i]);
+        SDL_DestroyTexture(diedAnimation[i]);
+        SDL_DestroyTexture(attackAnimation[i]);
+    }
     SDL_DestroyTexture(victoryAnimation);
-    SDL_DestroyTexture(attackAnimation);
     Free();
 }
 
@@ -38,31 +43,33 @@ bool Character::loadCharacter(std::string path, SDL_Renderer* renderer, int _id)
 {
     SDL_Surface* loadedSurface;
 
-    loadedSurface = IMG_Load((path + "/jump.png").c_str());
-    if(loadedSurface == NULL) return 0;
+    for(int i = 0; i <= 1; i++){
+        std::string s = int2str(i) + ".png";
+        loadedSurface = IMG_Load((path + "/jump" + s).c_str());
+        if(loadedSurface == NULL) return 0;
 
-    jump = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+        jump[i] = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 
-    loadedSurface = IMG_Load((path + "/idle.png").c_str());
-    if(loadedSurface == NULL) return 0;
+        loadedSurface = IMG_Load((path + "/idle" + s).c_str());
+        if(loadedSurface == NULL) return 0;
 
-    idleAnimation = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+        idleAnimation[i] = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 
-    loadedSurface = IMG_Load((path + "/move.png").c_str());
-    if(loadedSurface == NULL) return 0;
+        loadedSurface = IMG_Load((path + "/move" + s).c_str());
+        if(loadedSurface == NULL) return 0;
 
-    moveAnimation = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+        moveAnimation[i] = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 
-    loadedSurface = IMG_Load((path + "/died.png").c_str());
-    if(loadedSurface == NULL) return 0;
+        loadedSurface = IMG_Load((path + "/died" + s).c_str());
+        if(loadedSurface == NULL) return 0;
 
-    diedAnimation = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+        diedAnimation[i] = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 
-    loadedSurface = IMG_Load((path + "/attack.png").c_str());
-    if(loadedSurface == NULL) return 0;
+        loadedSurface = IMG_Load((path + "/attack" + s).c_str());
+        if(loadedSurface == NULL) return 0;
 
-    attackAnimation = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-
+        attackAnimation[i] = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+    }
     loadedSurface = IMG_Load((path + "/victory.png").c_str());
     if(loadedSurface == NULL) return 0;
 
@@ -79,6 +86,7 @@ bool Character::loadCharacter(std::string path, SDL_Renderer* renderer, int _id)
         file >> _attack.first >> _attack.second;
         file >> _died.first >> _died.second;
         file >> _victory.first >> _victory.second;
+        file >> framePerAttack;
         file.close();
     }
 
@@ -89,105 +97,138 @@ bool Character::loadCharacter(std::string path, SDL_Renderer* renderer, int _id)
 
 void Character::drawIdle(SDL_Renderer* renderer, int view)
 {
-    SDL_Rect nRect = {0, 0, 240, 240};
-    SDL_Rect tRect = {rect.x - 75 - view, rect.y - 75, 240, 240};
-    if(status != 0){
+    SDL_Rect nRect = {0, 0, charSize, charSize};
+    SDL_Rect tRect = {rect.x - 75 - view - 50 * facing, rect.y - 75, charSize, charSize};
+
+    if(nStatus != status)
         frame = 0;
-    }
-    else{
-        frame++;
-        if(frame == _idle.second) frame -= _idle.second;
-    }
+
     status = 0;
 
     nRect.x = (frame % _idle.first) * charSize;
     nRect.y = (frame / _idle.first) * charSize;
-    SDL_RenderCopy(renderer, idleAnimation, &nRect, &tRect);
+    SDL_RenderCopy(renderer, idleAnimation[facing], &nRect, &tRect);
+    frame++;
+    if(frame == _idle.second) frame -= _idle.second;
 }
 
 void Character::drawMove(SDL_Renderer* renderer, int view)
 {
-    SDL_Rect nRect = {0, 0, 240, 240};
-    SDL_Rect tRect = {rect.x - 75 - view, rect.y - 75, 240, 240};
-    if(status != 1){
+    SDL_Rect nRect = {0, 0, charSize, charSize};
+    SDL_Rect tRect = {rect.x - 75 - view - 50 * facing, rect.y - 75, charSize, charSize};
+
+    if(nStatus != status)
         frame = 0;
-    }
-    else{
-        frame++;
-        if(frame == _move.second) frame -= _move.second;
-    }
+
     status = 1;
 
     nRect.x = (frame % _move.first) * charSize;
     nRect.y = (frame / _move.first) * charSize;
-    SDL_RenderCopy(renderer, moveAnimation, &nRect, &tRect);
+    SDL_RenderCopy(renderer, moveAnimation[facing], &nRect, &tRect);
+    frame++;
+    if(frame == _move.second) frame -= _move.second;
+}
+
+void Character::drawDied(SDL_Renderer* renderer, int view)
+{
+    SDL_Rect nRect = {0, 0, charSize, charSize};
+    SDL_Rect tRect = {(SCREEN_WIDTH - charWidth) / 2 - 75, (SCREEN_HEIGHT - charHeight) / 2 - 75, charSize, charSize};
+
+    if(nStatus != status)
+        frame = 0;
+
+    if(frame == _died.second) frame--;
+
+    status = 4;
+
+    nRect.x = (frame % _died.first) * charSize;
+    nRect.y = (frame / _died.first) * charSize;
+    SDL_RenderCopy(renderer, diedAnimation[facing], &nRect, &tRect);
+    frame++;
+}
+
+void Character::drawVictory(SDL_Renderer* renderer, int view)
+{
+    SDL_Rect nRect = {0, 0, charSize, charSize};
+    SDL_Rect tRect = {(SCREEN_WIDTH - charWidth) / 2 - 75, (SCREEN_HEIGHT - 2 * TILE_SIZE) - charHeight - 75, charSize, charSize};
+
+    if(nStatus != status)
+        frame = 0;
+
+    if(frame == _victory.second) frame -= _victory.second;
+
+    status = 5;
+
+    nRect.x = (frame % _victory.first) * charSize;
+    nRect.y = (frame / _victory.first) * charSize;
+    SDL_RenderCopy(renderer, victoryAnimation, &nRect, &tRect);
+    frame++;
+}
+
+void Character::drawAttack(SDL_Renderer* renderer, int view)
+{
+    SDL_Rect nRect = {0, 0, charSize, charSize};
+    SDL_Rect tRect = {rect.x - 75 - view - 50 * facing, rect.y - 75, charSize, charSize};
+
+    if(nStatus != status && finishAttack) frame = 0;
+
+    if(frame == _attack.second - 1)
+    {
+        finishAttack = true;
+    }
+    status = 3;
+
+    nRect.x = (frame % _attack.first) * charSize;
+    nRect.y = (frame / _attack.first) * charSize;
+    SDL_RenderCopy(renderer, attackAnimation[facing], &nRect, &tRect);
+    frame++;
 }
 
 void Character::show(SDL_Renderer* renderer, int view)
 {
 
     //std::cout << view << '\n';
-    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
     SDL_Rect tRect = rect;
     tRect.x = rect.x - view;
 
     SDL_RenderDrawRect(renderer, &tRect);
 
-    if(isJumping || isFalling)
+    if(nStatus != status && (finishAttack || nextAttack == 0)) frame = 0;
+
+    if(nStatus == 4)
     {
-        SDL_Rect nRect = {rect.x - 75 - view, rect.y - 75, 240, 240};
-        SDL_RenderCopy(renderer, jump, NULL, &nRect);
+        drawDied(renderer, view);
+        return;
+    }
+    if(nStatus == 5)
+    {
+        drawVictory(renderer, view);
+        return;
+    }
+
+    nextAttack++;
+
+    if(nStatus == 3 || !finishAttack)
+    {
+        drawAttack(renderer, view);
+    }
+    else if(isJumping || isFalling)
+    {
+        SDL_Rect nRect = {rect.x - 75 - view - 50 * facing, rect.y - 75, 240, 240};
+        SDL_RenderCopy(renderer, jump[facing], NULL, &nRect);
         status = 2;
+        return;
     }
-    else
-    {
-        if(nStatus == 0) drawIdle(renderer, view);
-        if(nStatus == 1) drawMove(renderer, view);
-    }
-    velX = 0;
+
+    else if(nStatus == 0) drawIdle(renderer, view);
+    else if(nStatus == 1) drawMove(renderer, view);
+    //std :: cout << nStatus << '\n';
 }
 
-void Character::handleInput(SDL_Event event,const Uint8 *keyboard_state_array)
+void Character::handleInput(SDL_Event event)
 {
-//    bool ok = 1;
-//
-//    if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT
-//        && isFalling == false)
-//    {
-//        isJumping = isFalling = true;
-//        velY = -34;
-//        nStatus = 2;
-//    }
-//
-//    if(keyboard_state_array[SDL_SCANCODE_A])
-//    {
-//        nStatus = 1;
-//        velX = -MAX_RUN_SPEED;
-//        leftP = true;
-//        rightP = false;
-//        ok = 0;
-//    }
-//    if(keyboard_state_array[SDL_SCANCODE_D])
-//    {
-//        nStatus = 1;
-//        velX = MAX_RUN_SPEED;
-//        leftP = false;
-//        rightP = true;
-//        ok = 0;
-//    }
-//
-//
-//    if(isFalling || isJumping)
-//    {
-//        if(leftP)
-//            velX = -MAX_RUN_SPEED;
-//        else if(rightP)
-//            velX = MAX_RUN_SPEED;
-//    }
-//
-//    if(isFalling)
-//        std::cout << leftP << ' ' << rightP << '\n';
     if(event.type == SDL_KEYDOWN)
     {
         switch(event.key.keysym.sym)
@@ -208,10 +249,17 @@ void Character::handleInput(SDL_Event event,const Uint8 *keyboard_state_array)
             {
                 if(isFalling == false){
                     pressed[' '] = 1;
-                    nStatus = 2;
-                    isFalling = isJumping = true;
+
                 }
             }
+            break;
+        case SDLK_k:
+            {
+                if(nextAttack >= framePerAttack){
+                    pressed['k'] = 1;
+                }
+            }
+            break;
         }
     }
 
@@ -229,6 +277,15 @@ void Character::handleInput(SDL_Event event,const Uint8 *keyboard_state_array)
                 pressed['d'] = 0;
             }
             break;
+        case SDLK_SPACE:
+            {
+                pressed[' '] = 0;
+            }
+        case SDLK_k:
+            {
+                pressed['k'] = 0;
+            }
+            break;
         }
     }
 
@@ -237,7 +294,18 @@ void Character::handleInput(SDL_Event event,const Uint8 *keyboard_state_array)
 
 void Character::tick(game_map* MAP)
 {
-    if(pressed[' ']) {
+    if(rect.y >= MAP->Map_Y * TILE_SIZE)
+    {
+        nStatus = 4;
+        return;
+    }
+    if(rect.x >= MAP->victory)
+    {
+        nStatus = 5;
+        return;
+    }
+
+    if(pressed[' '] && isFalling == false) {
         isJumping = isFalling = true;
         nStatus = 2;
         velY = -40;
@@ -259,12 +327,14 @@ void Character::tick(game_map* MAP)
 
     if(pressed['a'])
     {
+        facing = 1;
         nStatus = 1;
         rect.x -= MAX_RUN_SPEED;
     }
     else if(pressed['d'])
     {
         nStatus = 1;
+        facing = 0;
         rect.x += MAX_RUN_SPEED;
     }
 
@@ -272,6 +342,13 @@ void Character::tick(game_map* MAP)
     if(rect.x > MAP->Map_X * TILE_SIZE) rect.x = MAP->Map_X * TILE_SIZE;
 
     collisionX(MAP);
+
+    if(pressed['k'] && nextAttack >= framePerAttack)
+    {
+        nStatus = 3;
+        finishAttack = false;
+        nextAttack = 0;
+    }
 
 }
 
@@ -350,4 +427,9 @@ void Character::setStatus(int _status)
 int Character::getStatus()
 {
     return nStatus;
+}
+
+bool Character::getAttack()
+{
+    return finishAttack;
 }

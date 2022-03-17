@@ -28,7 +28,7 @@ bool GameObject::loadImage(std::string path, SDL_Renderer* renderer)
     else
     {
         //Create texture from surface pixels
-        newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface );
+        newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
         if(newTexture == NULL)
         {
             printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
@@ -46,9 +46,9 @@ bool GameObject::loadImage(std::string path, SDL_Renderer* renderer)
     return pObject != NULL;
 }
 
-void GameObject::render(SDL_Renderer* ren)
+void GameObject::render(SDL_Renderer* ren, int view)
 {
-    SDL_Rect nRect = {rect.x, rect.y, rect.w, rect.h};
+    SDL_Rect nRect = {rect.x - view, rect.y, rect.w, rect.h};
 
     SDL_RenderCopy(ren, pObject, NULL, &nRect);
 }

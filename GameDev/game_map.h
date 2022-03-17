@@ -17,12 +17,15 @@ public:
     int getNumBush(int _NumBush);
     int info[41][301];
     int Map_X, Map_Y;
+    int victory;
 
 protected:
     std::vector<SDL_Texture*> Block;
     std::vector<SDL_Texture*> Bush;
     SDL_Surface* Map_Sheet;
     SDL_Texture* background;
+    SDL_Texture* castle;
+    SDL_Texture* flag;
     int Num_Block;
     int Num_Bush;
 
