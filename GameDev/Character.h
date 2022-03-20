@@ -13,7 +13,7 @@ public:
     void show(SDL_Renderer* renderer, int view);
     void handleInput(SDL_Event event);
     bool loadCharacter(std::string path, SDL_Renderer* renderer, int _id);
-    void tick(game_map* MAP);
+    void tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rectMob);
     void collisionX(game_map* MAP);
     void collisionY(game_map* MAP);
     void drawIdle(SDL_Renderer* renderer, int view);
@@ -32,6 +32,7 @@ protected:
     SDL_Texture* diedAnimation[2];
     SDL_Texture* victoryAnimation;
     SDL_Texture* jump[2];
+    SDL_Rect melee;
 
     std::pair<int, int> _idle;
     std::pair<int, int> _move;
@@ -57,8 +58,9 @@ protected:
     bool leftP = false, rightP = false;
     bool pressed[300];
     bool finishAttack;
-    int nextAttack, framePerAttack;
+    int nextAttack, framePerAttack, frameAttack;
     bool facing;
+    int type;
 };
 
 #endif // CHARACTER_H_

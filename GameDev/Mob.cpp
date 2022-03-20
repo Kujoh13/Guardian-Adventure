@@ -14,6 +14,10 @@ Mob::Mob()
     maxX = minX = 0;
     nextAttack = 0;
     idProjectile = 0;
+    dmg = 0;
+    hp = 0;
+    mobId = 0;
+    hostile = true;
 
     _idle = {0, 0};
     _move = {0, 0};
@@ -21,10 +25,16 @@ Mob::Mob()
 }
 Mob::~Mob()
 {
+    Free();
     for(int i = 0; i <= 1; i++){
         SDL_DestroyTexture(idleAnimation[i]);
         SDL_DestroyTexture(moveAnimation[i]);
         SDL_DestroyTexture(attackAnimation[i]);
+    }
+    for(int i = 0; i <= 1; i++){
+        idleAnimation[i] = NULL;
+        attackAnimation[i] = NULL;
+        moveAnimation[i] = NULL;
     }
 }
 bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
@@ -41,6 +51,7 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
             idle = true;
             idleAnimation[i] = SDL_CreateTextureFromSurface(renderer, loadedSurface);
         }
+        else std::cout << SDL_GetError() << '\n';
 
         loadedSurface = IMG_Load((path + "/move_" + s[weapon] + st).c_str());
 
@@ -48,6 +59,7 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
             move = true;
             moveAnimation[i] = SDL_CreateTextureFromSurface(renderer, loadedSurface);
         }
+        else std::cout << SDL_GetError() << '\n';
 
         loadedSurface = IMG_Load((path + "/attack_" + s[weapon] + st).c_str());
 
@@ -55,9 +67,11 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
             attack = true;
             attackAnimation[i] = SDL_CreateTextureFromSurface(renderer, loadedSurface);
         }
+        else std::cout << SDL_GetError() << '\n';
     }
 
-    std::ifstream file(path + "/info.txt");
+
+    std::ifstream file(path + "/mob_info.txt");
 
     if(!file.is_open())
         return false;
@@ -65,14 +79,20 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
     file >> _idle.first >> _idle.second;
     file >> _move.first >> _move.second;
     file >> _attack.first >> _attack.second;
-    file >> minX >> maxX;
     file >> framePerAttack;
     file >> idProjectile;
-
+    file >> rect.w >> rect.h;
+    file >> hp >> dmg;
+    file >> type;
+    file >> velX;
+    file >> hostile;
+    if(type == 0){
+        file >> melee.x >> melee.y >> melee.w >> melee.h;
+        file >> frameAttack;
+    }
     file.close();
 
     SDL_FreeSurface(loadedSurface);
-    rect = {450, -100, 40, 85};
 
     return 1;
 }
@@ -86,6 +106,7 @@ void Mob::drawIdle(SDL_Renderer* renderer, int view)
     nRect.y = (frame / _idle.first) * charSize;
 
     SDL_RenderCopy(renderer, idleAnimation[facing], &nRect, &tRect);
+
     frame++;
     if(frame == _idle.second) frame -= _idle.second;
 }
@@ -140,7 +161,7 @@ void Mob::show(SDL_Renderer* renderer, int view)
 
 }
 
-void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, SDL_Rect character)
+void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* character)
 {
     if(move)
     {
@@ -149,7 +170,7 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, SDL_Rect cha
     }
     if(idle)
     {
-        if(rect.x >= character.x) facing = 1;
+        if(rect.x >= character->getX()) facing = 1;
         else facing = 0;
     }
     if(rect.x > maxX)
@@ -168,13 +189,28 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, SDL_Rect cha
     rect.y += MAX_FALL_SPEED;
     collisionY(MAP);
 
-    if(nextAttack == 0)
+    if(nextAttack == 0 && type == 1)
     {
         Projectile temp;
-        temp.shoot(character, rect, idProjectile);
+        temp.shoot(character->getRect(), rect, idProjectile, dmg);
         vProjectile.push_back(temp);
     }
 
+    if(nextAttack == frameAttack && type == 0){
+
+        SDL_Rect tempRect = rect;
+        tempRect.x += melee.x;
+        tempRect.y += melee.y;
+        tempRect.w = melee.w;
+        tempRect.h = melee.h;
+
+        if(facing) tempRect.x -= melee.w - charWidth;
+
+        if(collision(tempRect, character->getRect())){
+            std :: cout << "txb\n";
+            character->setHp(character->getHp() - dmg);
+        }
+    }
 }
 
 void Mob::collisionX(game_map* MAP)
@@ -245,3 +281,17 @@ void Mob::setWeapon(int _weapon)
     weapon = _weapon;
 }
 
+void Mob::setId(int _id)
+{
+    mobId = _id;
+}
+
+int Mob::getId()
+{
+    return mobId;
+}
+
+void Mob::setRange(int l, int r)
+{
+    minX = l, maxX = r;
+}

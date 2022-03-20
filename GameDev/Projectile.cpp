@@ -13,15 +13,15 @@ Projectile::~Projectile()
     Free();
 }
 
-bool Projectile::collision(Character* character)
+bool Projectile::collide(Character* character)
 {
     SDL_Rect hitbox = getHitBox();
 
-    if((hitbox.x <= character->getX() && character->getX() < hitbox.x + hitbox.w
-        || hitbox.x <= character->getX() + character->getW() && character->getX() + character->getW() < hitbox.x + hitbox.w)
-       && (hitbox.y <= character->getY() && character->getH() < hitbox.y + hitbox.h
-        || hitbox.y <= character->getY() + character->getH() && character->getY() + character->getH() < hitbox.y + hitbox.h))
-       return 1;
+    if(collision(hitbox, character->getRect()))
+    {
+        character->setHp(character->getHp() - dmg);
+        return 1;
+    }
     return 0;
 }
 
@@ -34,14 +34,14 @@ void Projectile::tick()
 
 }
 
-void Projectile::shoot(SDL_Rect character, SDL_Rect mob, int _id)
+void Projectile::shoot(SDL_Rect character, SDL_Rect mob, int _id, int _dmg)
 {
     id = _id;
 
+    dmg = _dmg;
+
     rect.x = (2 * mob.x + mob.w) / 2;
     rect.y = (2 * mob.y + mob.h) / 2;
-
-    rect.w = 8; rect.h = 39;
 
     int x = (2 * character.x + character.w - 2 * mob.x - mob.w) / 2;
     int y = (2 * character.y + character.h - 2 * mob.y - mob.h) / 2;
@@ -57,6 +57,9 @@ void Projectile::shoot(SDL_Rect character, SDL_Rect mob, int _id)
     double X = (2 * character.x + character.w - 2 * mob.x - mob.w) / 2;
     double Y = (2 * character.y + character.h - 2 * mob.y - mob.h) / 2;
 
+    if(X * X + Y * Y == 0)
+        std :: cout << "Divide by 0!!!" << '\n';
+
     velX = X * speed / sqrt(X * X + Y * Y);
 
     velY = Y * speed / sqrt(X * X + Y * Y);
@@ -66,6 +69,11 @@ void Projectile::shoot(SDL_Rect character, SDL_Rect mob, int _id)
 SDL_Rect Projectile::getHitBox(int view)
 {
     return {rect.x - view, rect.y + rect.h / 3, rect.w, rect.h / 3};
+}
+
+SDL_Rect Projectile::getHitBox()
+{
+    return {rect.x, rect.y + rect.h / 3, rect.w, rect.h / 3};
 }
 
 void Projectile::setSpeed(double _speed)
@@ -92,3 +100,4 @@ int Projectile::getId()
 {
     return id;
 }
+

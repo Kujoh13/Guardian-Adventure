@@ -8,6 +8,7 @@ GameObject::GameObject()
     rect.w = 0;
     rect.h = 0;
     velX = velY = 0;
+    hp = dmg = 0;
 }
 
 GameObject::~GameObject()

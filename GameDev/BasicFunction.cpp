@@ -15,3 +15,8 @@ bool operator == (SDL_Color a, SDL_Color b)
 {
     return a.r == b.r && a.g == b.g && a.b == b.b;
 }
+
+bool collision(SDL_Rect A, SDL_Rect B)
+{
+    return !(A.x >= B.x + B.w || A.x + A.w <= B.x || A.y >= B.y + B.h || A.y + A.w <= B.y);
+}

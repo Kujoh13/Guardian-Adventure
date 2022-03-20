@@ -11,15 +11,16 @@ class Projectile : public GameObject
 public:
     Projectile();
     ~Projectile();
-    bool collision(Character* character);
+    bool collide(Character* character);
     void tick();
-    void shoot(SDL_Rect character, SDL_Rect mob, int id);
+    void shoot(SDL_Rect character, SDL_Rect mob, int _id, int _dmg);
     void setSpeed(double _speed);
     void addCurTime();
     bool done();
     double getAngle();
     int getId();
     SDL_Rect getHitBox(int view);
+    SDL_Rect getHitBox();
 
 protected:
     double angle;

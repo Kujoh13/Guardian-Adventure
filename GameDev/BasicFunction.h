@@ -8,6 +8,7 @@
 #include <SDL_audio.h>
 #include <SDL_ttf.h>
 
+
 static SDL_Window* gWindow = NULL;
 static SDL_Renderer* gRenderer = NULL;
 static SDL_Event gEvent;
@@ -21,6 +22,7 @@ const int SCREEN_BPP = 32;
 const int TILE_SIZE = 36;
 std::string int2str(int num);
 bool operator == (SDL_Color a, SDL_Color b);
+bool collision(SDL_Rect A, SDL_Rect B);
 
 const SDL_Color red = {255, 0, 0, 255};
 const SDL_Color blue = {0, 0, 255, 255};
@@ -30,7 +32,7 @@ const SDL_Color white = {255, 255, 255, 255};
 const SDL_Color yellow = {255, 255, 0, 255};
 const SDL_Color pink = {255, 0, 255, 255};
 
-//Character
+//Character and Mob
 const double gravity = 3;
 const double MAX_FALL_SPEED = 25;
 const double MAX_RUN_SPEED = 10;
@@ -43,9 +45,6 @@ const int charHeight = 85;
 //Projectiles
 const int numProjectile = 1;
 const double pi = acos(-1);
-//double gAngle(SDL_Point A, SDL_Point B)
-//{
-//    return (A.x * B.x + )
-//}
+
 
 #endif

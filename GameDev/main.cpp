@@ -16,20 +16,8 @@ const string WINDOW_TITLE = "Game SDL";
 
 void initSDL(SDL_Window* &window, SDL_Renderer* &renderer);
 
-GameObject gBackground;
-game_map* MAP = new game_map;
-
-
-bool load(int level)
-{
-    bool ret = MAP->loadMap("img", gRenderer, level);
-    return ret;
-}
-
 void close()
 {
-    gBackground.Free();
-
     SDL_DestroyRenderer (gRenderer);
     gRenderer = NULL;
 
@@ -43,10 +31,58 @@ void close()
 int view;
 Character _character[numCharacter];
 
-std::vector<Mob>* vMob;
 std::vector<Projectile> vProjectile;
+std::vector<Mob> vMob;
+SDL_Texture* pr[numProjectile];
+int pr_w[numProjectile];
+int pr_h[numProjectile];
+game_map* MAP = new game_map;
 
-SDL_Texture* pr[1];
+bool loadLevel(int level)
+{
+    bool ret = MAP->loadMap("img", gRenderer, level);
+    if(!ret)
+        return false;
+
+    std::string map_path = "img/Level_" + int2str(level) + "/";
+    ifstream fileMob((map_path + "level_info.txt").c_str());
+    {
+        if(fileMob.is_open() == false){
+            std :: cout << "Missing mob file!!!";
+        }
+        int numMob = 0, typeMob = 0;
+        fileMob >> typeMob;
+        for(int i = 0; i < typeMob; i++)
+        {
+            fileMob >> numMob;
+            for(int j = 0; j < numMob; j++)
+            {
+                Mob mob;
+                int x, y, w;
+                fileMob >> x >> y >> w;
+                mob.setWeapon(w);
+                mob.setX(x);
+                mob.setY(y);
+                mob.setId(i);
+                int l, r;
+                fileMob >> l >> r;
+                mob.setRange(l, r);
+
+                vMob.push_back(mob);
+
+            }
+        }
+    }
+
+
+    fileMob.close();
+
+    for(int i = 0; i < vMob.size(); i++){
+        if(!vMob[i].loadMob(map_path + int2str(vMob[i].getId()), gRenderer))
+            return 0;
+    }
+    return 1;
+}
 
 int main(int argc, char* argv[]){
 
@@ -55,7 +91,7 @@ int main(int argc, char* argv[]){
     Screen scr;
     scr.loadTexture(gRenderer);
 
-    int isRunning = 1;
+    int isRunning = 3;
     /** Notes:
     1. Start Screen
     2. Level Selection
@@ -64,31 +100,45 @@ int main(int argc, char* argv[]){
     int currentLevel = 1;
     int currentCharacter = 0;
 
-    if(!load(1))
+    if(!loadLevel(1))
         return -1;
 
-    Mob mob;
+    //////////////
 
-    mob.setWeapon(1);
-
-    if(!mob.loadMob("img/Level_1/0", gRenderer))
-        return -1;
-
-    for(int i = 0; i < numCharacter; i++){
+    for(int i = 0; i < numCharacter; i++)
         if(!_character[i].loadCharacter("Character/" + int2str(i), gRenderer, i))
+        {
+            std::cout << "Can't load character " << i << "!!!";
             return -1;
-    }
+        }
 
-    for(int i = 0; i < 1; i++){
+    /////////////
+
+    for(int i = 0; i < numProjectile; i++)
+    {
         std::string path = "img/Projectile/" + int2str(i) + ".png";
 
         SDL_Surface* sf = IMG_Load(path.c_str());
-        if(sf == NULL) return -1;
+        if(sf == NULL)
+        {
+            std :: cout << "Missing projectile image!!!";
+            return -1;
+        }
 
         pr[i] = SDL_CreateTextureFromSurface(gRenderer, sf);
 
         SDL_FreeSurface(sf);
     }
+    std::string path = "img/Projectile/info.txt";
+
+    ifstream file(path);
+
+    for(int i = 0; i < numProjectile; i++){
+        file >> pr_w[i] >> pr_h[i];
+    }
+    file.close();
+
+    //////////////
 
     int lastTime = 0, currentTime = 0;
 
@@ -135,39 +185,67 @@ int main(int argc, char* argv[]){
                 scr.startScreen(gRenderer);
             }
             else if(isRunning == 3){
-                //scr.levelSelection(gRenderer);
+                scr.levelSelection(gRenderer);
                 MAP->setNumBlock(4);
 
-                _character[currentCharacter].tick(MAP);
-                mob.tick(MAP, vProjectile, _character[currentCharacter].getRect());
+                vector<std::pair<SDL_Rect, int> > rectMob;
+
+                for(int i = 0; i < vMob.size(); i++){
+                    rectMob.push_back({vMob[i].getRect(), vMob[i].getHp()});
+                }
+
+                _character[currentCharacter].tick(MAP, rectMob);
+
+                if(vMob.size())
+                for(int i = vMob.size() - 1; i >= 0; i--){
+                    vMob[i].setHp(rectMob[i].second);
+                    if(rectMob[i].second == 0){
+                       swap(rectMob[i], rectMob.back());
+                       swap(vMob[i], vMob.back());
+                       rectMob.pop_back();
+                       vMob.pop_back();
+                    }
+                    else
+                        vMob[i].tick(MAP, vProjectile, &_character[currentCharacter]);
+                }
+
+                rectMob.clear();
+
+                if(_character[currentCharacter].getX() >= SCREEN_WIDTH / 2)
+                    view = _character[currentCharacter].getX() - (SCREEN_WIDTH / 2);
+                else view = 0;
 
                 if(vProjectile.size())
                 for(int i = vProjectile.size() - 1; i >= 0 ; i--){
                     vProjectile[i].tick();
-                    if(vProjectile[i].done())
+                    if(vProjectile[i].done() || vProjectile[i].collide(&_character[currentCharacter]))
                     {
                         swap(vProjectile[i], vProjectile.back());
                         vProjectile.pop_back();
                     }
                 }
 
-                if(_character[currentCharacter].getX() >= SCREEN_WIDTH / 2)
-                    view = _character[currentCharacter].getX() - (SCREEN_WIDTH / 2);
-                else view = 0;
-
-
-
                 MAP->render(gRenderer, view);
 
-                mob.show(gRenderer, view);
+                for(int i = 0; i < vMob.size(); i++){
+                    vMob[i].show(gRenderer, view);
+                }
+
+                //mob.show(gRenderer, view);
+
+
                 _character[currentCharacter].show(gRenderer, view);
                 for(int i = 0; i < vProjectile.size(); i++){
+
+                    vProjectile[i].setW(pr_w[vProjectile[i].getId()]);
+                    vProjectile[i].setH(pr_h[vProjectile[i].getId()]);
 
                     SDL_Rect tRect = vProjectile[i].getRect();
                     tRect.x -= view;
 
-                    SDL_Rect nRect = vProjectile[i].getHitBox(view);
-
+                    SDL_Rect nRect = vProjectile[i].getHitBox();
+                    nRect.x -= view;
+                    SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
                     SDL_RenderDrawRect(gRenderer, &nRect);
 
                     SDL_RenderCopyEx(gRenderer, pr[vProjectile[i].getId()], NULL, &tRect, vProjectile[i].getAngle(), NULL, SDL_FLIP_NONE);
@@ -180,6 +258,9 @@ int main(int argc, char* argv[]){
         }
 
     }
+
+    for(int i = 0; i < numProjectile; i++)
+        SDL_DestroyTexture(pr[i]);
     close();
 
     return 0;
