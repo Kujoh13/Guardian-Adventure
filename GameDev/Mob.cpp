@@ -22,6 +22,9 @@ Mob::Mob()
     _idle = {0, 0};
     _move = {0, 0};
     _attack = {0, 0};
+
+    for(int i = 0; i < 3; i++)
+        itemDrop[i] = 0;
 }
 Mob::~Mob()
 {
@@ -83,6 +86,7 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
     file >> idProjectile;
     file >> rect.w >> rect.h;
     file >> hp >> dmg;
+    maxHp = hp;
     file >> type;
     file >> velX;
     file >> hostile;
@@ -90,6 +94,7 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
         file >> melee.x >> melee.y >> melee.w >> melee.h;
         file >> frameAttack;
     }
+    file >> itemDrop[0];
     file.close();
 
     SDL_FreeSurface(loadedSurface);
@@ -138,11 +143,6 @@ void Mob::show(SDL_Renderer* renderer, int view)
 {
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
-    SDL_Rect tRect = rect;
-    tRect.x = rect.x - view;
-
-    SDL_RenderDrawRect(renderer, &tRect);
 
     if(nextAttack >= _attack.second){
         if(nextAttack == _attack.second) frame = 0;
@@ -207,10 +207,28 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
         if(facing) tempRect.x -= melee.w - charWidth;
 
         if(collision(tempRect, character->getRect())){
-            std :: cout << "txb\n";
             character->setHp(character->getHp() - dmg);
         }
     }
+}
+
+void Mob::spawnItem(std::vector<Item>& vItem)
+{
+    for(int id = 0; id < 3; id++)
+        for(int i = 0; i < std::min(itemDrop[id], 10); i++){
+            Item nItem;
+            nItem.setX((rect.x * 2 + rect.w) / 2);
+            nItem.setY((rect.y * 2 + rect.h) / 2);
+            nItem.setVelY(-30);
+            nItem.setVelX(Rand(-10, 10));
+            nItem.setW(30);
+            nItem.setH(30);
+            nItem.setId(id);
+            int val = itemDrop[id] / 10;
+            if(i < itemDrop[id] % 10) val++;
+            nItem.setVal(val);
+            vItem.push_back(nItem);
+        }
 }
 
 void Mob::collisionX(game_map* MAP)

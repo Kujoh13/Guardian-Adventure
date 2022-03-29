@@ -32,6 +32,7 @@ protected:
     SDL_Texture* diedAnimation[2];
     SDL_Texture* victoryAnimation;
     SDL_Texture* jump[2];
+    SDL_Texture* portrait;
     SDL_Rect melee;
 
     std::pair<int, int> _idle;

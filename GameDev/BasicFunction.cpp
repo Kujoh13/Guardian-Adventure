@@ -20,3 +20,9 @@ bool collision(SDL_Rect A, SDL_Rect B)
 {
     return !(A.x >= B.x + B.w || A.x + A.w <= B.x || A.y >= B.y + B.h || A.y + A.w <= B.y);
 }
+
+std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+long long Rand(long long l, long long r)
+{
+    return std::uniform_int_distribution<long long> (l, r) (rng);
+}

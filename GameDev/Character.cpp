@@ -80,9 +80,16 @@ bool Character::loadCharacter(std::string path, SDL_Renderer* renderer, int _id)
         attackAnimation[i] = SDL_CreateTextureFromSurface(renderer, loadedSurface);
     }
     loadedSurface = IMG_Load((path + "/victory.png").c_str());
+
     if(loadedSurface == NULL) return 0;
 
     victoryAnimation = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+
+    loadedSurface = IMG_Load((path + "/portrait.png").c_str());
+
+    if(loadedSurface == NULL) return 0;
+
+    portrait = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 
     SDL_FreeSurface(loadedSurface);
 
@@ -99,6 +106,7 @@ bool Character::loadCharacter(std::string path, SDL_Renderer* renderer, int _id)
         file >> framePerAttack;
         file >> frameAttack;
         file >> hp >> dmg;
+        maxHp = hp;
         file >> melee.x >> melee.y >> melee.w >> melee.h;
         file.close();
     }
@@ -200,25 +208,12 @@ void Character::drawAttack(SDL_Renderer* renderer, int view)
 void Character::show(SDL_Renderer* renderer, int view)
 {
 
+    SDL_Rect pRect = {0, 0, portraitSize, portraitSize};
+
+    SDL_RenderCopy(renderer, portrait, NULL, &pRect);
+
     //std::cout << view << '\n';
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-
-    SDL_Rect tempRect = rect;
-    tempRect.x += melee.x;
-    tempRect.y += melee.y;
-    tempRect.w = melee.w;
-    tempRect.h = melee.h;
-
-    if(facing) tempRect.x -= melee.w - charWidth;
-
-    tempRect.x -= view;
-
-    SDL_RenderDrawRect(renderer, &tempRect);
-
-    SDL_Rect tRect = rect;
-    tRect.x = rect.x - view;
-
-    SDL_RenderDrawRect(renderer, &tRect);
 
     if(nStatus != status && (finishAttack || nextAttack == 0)) frame = 0;
 

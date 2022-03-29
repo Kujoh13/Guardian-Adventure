@@ -6,6 +6,7 @@
 #include "game_map.h"
 #include "Projectile.h"
 #include "Character.h"
+#include "Item.h"
 
 class Mob : public GameObject
 {
@@ -25,6 +26,7 @@ public:
     int getId();
     void setId(int _id);
     void setRange(int l, int r);
+    void spawnItem(std::vector<Item>& vItem);
 
 protected:
     SDL_Texture* idleAnimation[2];
@@ -47,6 +49,7 @@ protected:
     std::pair<int, int> _move;
     int maxX, minX;
     std::string s[4] = {"sword", "bow", "bomb", "staff"};
+    int itemDrop[3];
 };
 
 #endif // MOB_H_

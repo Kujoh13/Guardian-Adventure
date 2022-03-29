@@ -1,12 +1,15 @@
 /*
   SDL_ttf:  A companion library to SDL for working with TrueType (tm) fonts
   Copyright (C) 2001-2022 Sam Lantinga <slouken@libsdl.org>
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
+
   Permission is granted to anyone to use this software for any purpose,
   including commercial applications, and to alter it and redistribute it
   freely, subject to the following restrictions:
+
   1. The origin of this software must not be misrepresented; you must not
      claim that you wrote the original software. If you use this software
      in a product, an acknowledgment in the product documentation would be
@@ -125,11 +128,11 @@ extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndexDPI(const char *file, int pt
 extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontDPIRW(SDL_RWops *src, int freesrc, int ptsize, unsigned int hdpi, unsigned int vdpi);
 extern DECLSPEC TTF_Font * SDLCALL TTF_OpenFontIndexDPIRW(SDL_RWops *src, int freesrc, int ptsize, long index, unsigned int hdpi, unsigned int vdpi);
 
-/* Set font size dynamically. This clears already generated glyphs, if any, from the cache. */
+/* Set font size dynamically */
 extern DECLSPEC int SDLCALL TTF_SetFontSize(TTF_Font *font, int ptsize);
 extern DECLSPEC int SDLCALL TTF_SetFontSizeDPI(TTF_Font *font, int ptsize, unsigned int hdpi, unsigned int vdpi);
 
-/* Set and retrieve the font style. Setting the style clears already generated glyphs, if any, from the cache. */
+/* Set and retrieve the font style */
 #define TTF_STYLE_NORMAL        0x00
 #define TTF_STYLE_BOLD          0x01
 #define TTF_STYLE_ITALIC        0x02
@@ -140,7 +143,7 @@ extern DECLSPEC void SDLCALL TTF_SetFontStyle(TTF_Font *font, int style);
 extern DECLSPEC int SDLCALL TTF_GetFontOutline(const TTF_Font *font);
 extern DECLSPEC void SDLCALL TTF_SetFontOutline(TTF_Font *font, int outline);
 
-/* Set and retrieve FreeType hinter settings. Setting it clears already generated glyphs, if any, from the cache. */
+/* Set and retrieve FreeType hinter settings */
 #define TTF_HINTING_NORMAL          0
 #define TTF_HINTING_LIGHT           1
 #define TTF_HINTING_MONO            2
@@ -199,6 +202,7 @@ extern DECLSPEC int SDLCALL TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, 
 
 /* Get the measurement string of text without rendering
    e.g. the number of characters that can be rendered before reaching 'measure_width'
+
    in:
    measure_width - in pixels to measure this text
    out:
@@ -337,14 +341,11 @@ extern DECLSPEC SDL_Surface * SDLCALL TTF_RenderGlyph32_Blended(TTF_Font *font,
 /* Set Direction and Script to be used for text shaping.
    - direction is of type hb_direction_t
    - script is of type hb_script_t
+
    This functions returns always 0, or -1 if SDL_ttf is not compiled with HarfBuzz
 */
 extern DECLSPEC int SDLCALL TTF_SetDirection(int direction); /* hb_direction_t */
 extern DECLSPEC int SDLCALL TTF_SetScript(int script); /* hb_script_t */
-
-/* Set direction and script per font */
-extern DECLSPEC int SDLCALL TTF_SetFontDirection(TTF_Font *font, int direction); /* hb_direction_t */
-extern DECLSPEC int SDLCALL TTF_SetFontScript(TTF_Font *font, int script); /* hb_script_t */
 
 /* Close an opened font file */
 extern DECLSPEC void SDLCALL TTF_CloseFont(TTF_Font *font);

@@ -26,6 +26,7 @@ void close()
 
     IMG_Quit();
     SDL_Quit();
+    TTF_Quit();
 }
 
 int view;
@@ -33,7 +34,9 @@ Character _character[numCharacter];
 
 std::vector<Projectile> vProjectile;
 std::vector<Mob> vMob;
+std::vector<Item> vItem;
 SDL_Texture* pr[numProjectile];
+SDL_Texture* itemDrop[3];
 int pr_w[numProjectile];
 int pr_h[numProjectile];
 game_map* MAP = new game_map;
@@ -87,6 +90,7 @@ bool loadLevel(int level)
 int main(int argc, char* argv[]){
 
     initSDL(gWindow, gRenderer);
+    TTF_Init();
 
     Screen scr;
     scr.loadTexture(gRenderer);
@@ -140,8 +144,22 @@ int main(int argc, char* argv[]){
 
     //////////////
 
-    int lastTime = 0, currentTime = 0;
+    for(int i = 0; i < 3; i++){
+        std::string path = "img/item" + int2str(i) + ".png";
 
+        SDL_Surface* sf = IMG_Load(path.c_str());
+        if(sf == NULL)
+        {
+            std :: cout << "Missing item image!!!";
+            return -1;
+        }
+        itemDrop[i] = SDL_CreateTextureFromSurface(gRenderer, sf);
+        SDL_FreeSurface(sf);
+    }
+
+    //////////////
+
+    int lastTime = 0, currentTime = 0;
 
     while(isRunning)
     {
@@ -190,16 +208,31 @@ int main(int argc, char* argv[]){
 
                 vector<std::pair<SDL_Rect, int> > rectMob;
 
-                for(int i = 0; i < vMob.size(); i++){
+                for(int i = 0; i < vMob.size(); i++)
+                {
                     rectMob.push_back({vMob[i].getRect(), vMob[i].getHp()});
                 }
 
                 _character[currentCharacter].tick(MAP, rectMob);
 
+                if(vItem.size())
+                for(int i = vItem.size() - 1; i >= 0; i--)
+                {
+                    vItem[i].tick(_character[currentCharacter].getRect(), MAP);
+                    if(collision(vItem[i].getRect(), _character[currentCharacter].getRect()) && vItem[i].getFell())
+                    {
+                        swap(vItem[i], vItem.back());
+                        vItem.pop_back();
+                    }
+                }
+
                 if(vMob.size())
-                for(int i = vMob.size() - 1; i >= 0; i--){
+                for(int i = vMob.size() - 1; i >= 0; i--)
+                {
                     vMob[i].setHp(rectMob[i].second);
-                    if(rectMob[i].second == 0){
+                    if(rectMob[i].second == 0)
+                    {
+                       vMob[i].spawnItem(vItem);
                        swap(rectMob[i], rectMob.back());
                        swap(vMob[i], vMob.back());
                        rectMob.pop_back();
@@ -216,7 +249,8 @@ int main(int argc, char* argv[]){
                 else view = 0;
 
                 if(vProjectile.size())
-                for(int i = vProjectile.size() - 1; i >= 0 ; i--){
+                for(int i = vProjectile.size() - 1; i >= 0 ; i--)
+                {
                     vProjectile[i].tick();
                     if(vProjectile[i].done() || vProjectile[i].collide(&_character[currentCharacter]))
                     {
@@ -227,14 +261,56 @@ int main(int argc, char* argv[]){
 
                 MAP->render(gRenderer, view);
 
+                for(int i = 0; i < vItem.size(); i++){
+                    SDL_Rect nRect = vItem[i].getRect();
+                    nRect.x -= view;
+                    SDL_RenderCopy(gRenderer, itemDrop[vItem[i].getId()], NULL, &nRect);
+                }
+
                 for(int i = 0; i < vMob.size(); i++){
                     vMob[i].show(gRenderer, view);
+
+                    /// h / mh = x / 40 x = h * 40
+
+                    SDL_Rect tRect = {vMob[i].getX() - view, vMob[i].getY() - 5, 42, 7};
+
+                    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+
+                    SDL_RenderFillRect(gRenderer, &tRect);
+
+                    SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
+
+                    int w = vMob[i].getHp() * 40 / vMob[i].getMaxHp();
+
+                    tRect = {vMob[i].getX() + 1 - view, vMob[i].getY() - 4, w, 5};
+
+                    SDL_RenderFillRect(gRenderer, &tRect);
+
                 }
 
                 //mob.show(gRenderer, view);
 
+                scr.ingame(gRenderer, _character[currentCharacter].getHp(), _character[currentCharacter].getDmg());
 
                 _character[currentCharacter].show(gRenderer, view);
+                if(_character[currentCharacter].getStatus() != 5){
+
+                    SDL_Rect rect = {_character[currentCharacter].getX() - view, _character[currentCharacter].getY() - 5, 42, 7};
+
+                    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+
+                    SDL_RenderFillRect(gRenderer, &rect);
+
+                    int w = _character[currentCharacter].getHp() * 40 / _character[currentCharacter].getMaxHp();
+
+                    rect = {_character[currentCharacter].getX() + 1 - view, _character[currentCharacter].getY() - 4, w, 5};
+
+                    SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
+
+                    SDL_RenderFillRect(gRenderer, &rect);
+
+                }
+
                 for(int i = 0; i < vProjectile.size(); i++){
 
                     vProjectile[i].setW(pr_w[vProjectile[i].getId()]);
@@ -242,11 +318,6 @@ int main(int argc, char* argv[]){
 
                     SDL_Rect tRect = vProjectile[i].getRect();
                     tRect.x -= view;
-
-                    SDL_Rect nRect = vProjectile[i].getHitBox();
-                    nRect.x -= view;
-                    SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-                    SDL_RenderDrawRect(gRenderer, &nRect);
 
                     SDL_RenderCopyEx(gRenderer, pr[vProjectile[i].getId()], NULL, &tRect, vProjectile[i].getAngle(), NULL, SDL_FLIP_NONE);
                 }

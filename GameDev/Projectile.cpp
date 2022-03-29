@@ -5,8 +5,8 @@ Projectile::Projectile()
     angle = 0;
     isBomb = 0;
     curTime = 0;
-    lastTime = 70;
-    speed = 20;
+    lastTime = 50;
+    speed = 15;
 }
 Projectile::~Projectile()
 {

@@ -24,6 +24,7 @@ public:
     int getVelY() {return velY;}
     int getHp() {return hp;}
     int getDmg() {return dmg;}
+    int getMaxHp() {return maxHp;}
 
     void setX(int x) {rect.x = x;}
     void setY(int y) {rect.y = y;}
@@ -33,12 +34,14 @@ public:
     void setVelY(int _velY) {velY = _velY;}
     void setHp(int _hp) {hp = std::max(_hp, 0);}
     void setDmg(int _dmg) {dmg = _dmg;}
+    void setMaxHp(int _maxHp) {maxHp = _maxHp;}
 
 protected:
     SDL_Texture* pObject;
     SDL_Rect rect;
     int velX, velY;
     int hp, dmg;
+    int maxHp;
 };
 
 #endif

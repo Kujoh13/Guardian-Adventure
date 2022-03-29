@@ -182,3 +182,5 @@ void game_map::render(SDL_Renderer* ren, int view){
             }
         }
 }
+
+

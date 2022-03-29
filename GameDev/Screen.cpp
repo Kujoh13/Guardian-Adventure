@@ -25,13 +25,18 @@ void Screen::loadTexture(SDL_Renderer* renderer)
     start_button[1].loadImage("img/start_1.png", renderer);
     exit_button[0].loadImage("img/exit_0.png", renderer);
     exit_button[1].loadImage("img/exit_1.png", renderer);
+    hpIcon.loadImage("img/hpIcon.png", renderer);
+    dmgIcon.loadImage("img/dmgIcon.png", renderer);
+    statsRect.loadImage("img/statsRect.png", renderer);
+
+    font = TTF_OpenFont("REVUE.ttf", 45);
 
     start_screen_title0.setX(120);
     start_screen_title0.setY(-200);
     start_screen_title1.setX(15);
     start_screen_title1.setY(721);
     start_screen_title0.setVelY(13);
-    start_screen_title1.setVelY(-20 );
+    start_screen_title1.setVelY(-20);
 
     start_button[0].setX(460);
     start_button[0].setY(380);
@@ -42,6 +47,12 @@ void Screen::loadTexture(SDL_Renderer* renderer)
     exit_button[0].setY(550);
     exit_button[1].setX(450);
     exit_button[1].setY(542);
+
+    hpIcon.setX(5 + portraitSize);
+    hpIcon.setY(20);
+
+    dmgIcon.setX(5 + portraitSize);
+    dmgIcon.setY(70);
 
 }
 
@@ -124,5 +135,33 @@ void Screen::checkStart(int x, int y, int &isRunning, SDL_Event event)
 
 void Screen::levelSelection(SDL_Renderer* renderer)
 {
+
+}
+
+void Screen::ingame(SDL_Renderer* renderer, int char_hp, int char_dmg)
+{
+    statsRect.render(renderer, 0);
+    hpIcon.render(renderer, 0);
+    dmgIcon.render(renderer, 0);
+
+    SDL_Surface* textSurface = TTF_RenderText_Solid(font, int2str(char_hp).c_str(), white);
+
+    SDL_Texture* nTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+
+    SDL_Rect temp = {160, 15, textSurface->w, textSurface->h};
+
+    SDL_RenderCopy(renderer, nTexture, NULL, &temp);
+
+    textSurface = TTF_RenderText_Solid(font, int2str(char_dmg).c_str(), white);
+
+    nTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+
+    temp = {160, 65, textSurface->w, textSurface->h};
+
+    SDL_RenderCopy(renderer, nTexture, NULL, &temp);
+
+    SDL_FreeSurface(textSurface);
+
+    SDL_DestroyTexture(nTexture);
 
 }

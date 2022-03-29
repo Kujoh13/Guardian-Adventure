@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1647791700 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\main.cpp
+1648567733 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\main.cpp
 	"BasicFunction.h"
 	"GameObject.h"
 	"game_map.h"
@@ -8,10 +8,10 @@
 	"Mob.h"
 	"Projectile.h"
 
-1647788517 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.cpp
+1648522962 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.cpp
 	"BasicFunction.h"
 
-1647685468 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.h
+1648521957 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.h
 	<bits/stdc++.h>
 	<SDL.h>
 	<Windows.h>
@@ -22,46 +22,55 @@
 1647703638 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\gameobject.cpp
 	"GameObject.h"
 
-1647703746 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\gameobject.h
+1647943531 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\gameobject.h
 	"BasicFunction.h"
 
-1647526835 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
+1648496672 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
 	"game_map.h"
 
-1646969572 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
+1648525294 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
 	"BasicFunction.h"
 	"GameObject.h"
 
-1647370884 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.cpp
+1647943356 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.cpp
 	"Screen.h"
 
-1646333523 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.h
+1648550196 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.h
 	"BasicFunction.h"
 	"GameObject.h"
 
-1647757837 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.cpp
+1647960770 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.cpp
 	"Character.h"
 
-1647791679 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.h
+1647880624 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.h
 	"GameObject.h"
 	"BasicFunction.h"
 	"game_map.h"
 
-1647791740 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\mob.cpp
+1648567754 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\mob.cpp
 	"Mob.h"
 
-1647791679 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\mob.h
+1648528907 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\mob.h
 	"BasicFunction.h"
 	"GameObject.h"
 	"game_map.h"
 	"Projectile.h"
 	"Character.h"
+	"Item.h"
 
-1647757755 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\projectile.cpp
+1647964633 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\projectile.cpp
 	"Projectile.h"
 
 1647757779 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\projectile.h
 	"GameObject.h"
 	"Character.h"
 	"BasicFunction.h"
+
+1648549968 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\item.cpp
+	"Item.h"
+
+1648567505 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\item.h
+	"Character.h"
+	"BasicFunction.h"
+	"GameObject.h"
 
