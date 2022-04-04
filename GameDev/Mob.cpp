@@ -90,7 +90,7 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
     file >> type;
     file >> velX;
     file >> hostile;
-    if(type == 0){
+    if(type == TYPE::MELEE){
         file >> melee.x >> melee.y >> melee.w >> melee.h;
         file >> frameAttack;
     }
@@ -189,14 +189,14 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
     rect.y += MAX_FALL_SPEED;
     collisionY(MAP);
 
-    if(nextAttack == 0 && type == 1)
+    if(nextAttack == 0 && type == TYPE::RANGED)
     {
         Projectile temp;
         temp.shoot(character->getRect(), rect, idProjectile, dmg);
         vProjectile.push_back(temp);
     }
 
-    if(nextAttack == frameAttack && type == 0){
+    if(nextAttack == frameAttack && type == TYPE::MELEE){
 
         SDL_Rect tempRect = rect;
         tempRect.x += melee.x;

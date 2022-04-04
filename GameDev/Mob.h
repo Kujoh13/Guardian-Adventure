@@ -37,6 +37,10 @@ protected:
     bool hostile;
     int idProjectile;
     int type;
+    enum TYPE{
+        RANGED = 0,
+        MELEE = 1,
+    };
     int weapon;
     bool idle, move, attack;
     int frame;

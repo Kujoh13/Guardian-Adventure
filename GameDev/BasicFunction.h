@@ -47,7 +47,7 @@ const int charHeight = 85;
 const int portraitSize = 100;
 
 //Projectiles
-const int numProjectile = 1;
+const int numProjectile = 2;
 const double pi = acos(-1);
 
 

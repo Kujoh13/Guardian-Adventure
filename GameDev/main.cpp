@@ -128,19 +128,20 @@ int main(int argc, char* argv[]){
             std :: cout << "Missing projectile image!!!";
             return -1;
         }
-
+        pr_w[i] = sf->w;
+        pr_h[i] = sf->h;
         pr[i] = SDL_CreateTextureFromSurface(gRenderer, sf);
 
         SDL_FreeSurface(sf);
     }
-    std::string path = "img/Projectile/info.txt";
-
-    ifstream file(path);
-
-    for(int i = 0; i < numProjectile; i++){
-        file >> pr_w[i] >> pr_h[i];
-    }
-    file.close();
+//    std::string path = "img/Projectile/info.txt";
+//
+//    ifstream file(path);
+//
+//    for(int i = 0; i < numProjectile; i++){
+//        file >> pr_w[i] >> pr_h[i];
+//    }
+//    file.close();
 
     //////////////
 

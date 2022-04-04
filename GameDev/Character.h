@@ -31,7 +31,7 @@ protected:
     SDL_Texture* attackAnimation[2];
     SDL_Texture* diedAnimation[2];
     SDL_Texture* victoryAnimation;
-    SDL_Texture* jump[2];
+    SDL_Texture* jumpAnimation[2];
     SDL_Texture* portrait;
     SDL_Rect melee;
 
@@ -55,6 +55,14 @@ protected:
     4. died
     5. victory
     **/
+    enum STATUS{
+        IDLE = 0,
+        MOVE = 1,
+        JUMP = 2,
+        ATTACK = 3,
+        DIED = 4,
+        VICTORY = 5,
+    };
 
     bool leftP = false, rightP = false;
     bool pressed[300];
@@ -62,6 +70,11 @@ protected:
     int nextAttack, framePerAttack, frameAttack;
     bool facing;
     int type;
+
+    enum TYPE{
+        RANGED = 0,
+        MELEE = 1,
+    };
 };
 
 #endif // CHARACTER_H_
