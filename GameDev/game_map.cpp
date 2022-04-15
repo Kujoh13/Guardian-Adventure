@@ -113,6 +113,8 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
     SDL_Color rgb;
     Uint32 data;
 
+    int lp_x;
+
     for(int i = 0; i < Map_Y; i++)
         for(int j = 0; j < Map_X; j++)
         {
@@ -120,9 +122,28 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
             SDL_GetRGB(data, Map_Sheet->format, &rgb.r, &rgb.g, &rgb.b);
 
             if(rgb == white || rgb == green) info[i][j] = 1;
-            else info[i][j] = 0;
+            else
+            {
+                info[i][j] = 0;
+                if(rgb == yellow) lp_x = j * TILE_SIZE + 11 * TILE_SIZE;
+                if(rgb == pink) victory = j * TILE_SIZE;
+            }
         }
 
+    std::ifstream file((path + "/level_" + int2str(level) + "/lp_pos.txt").c_str());
+    int num_lp;
+    file >> num_lp;
+
+    for(int i = 0; i < num_lp; i++)
+    {
+        int temp_pos;
+        file >> temp_pos;
+        lp_pos.push_back(temp_pos);
+    }
+    file.close();
+    std::sort(lp_pos.begin(), lp_pos.end(), std::greater<int> ());
+
+    lp_pos.push_back(lp_x);
 
     return Map_Sheet != NULL && background != NULL;
 }
@@ -172,12 +193,12 @@ void game_map::render(SDL_Renderer* ren, int view){
             else if(rgb == yellow){
                 rect.w = 23 * TILE_SIZE;
                 rect.h = 18 * TILE_SIZE;
+
                 SDL_RenderCopy(ren, castle, NULL, &rect);
             }
             else if(rgb == pink){
                 rect.w = 2 * TILE_SIZE;
                 rect.h = 5 * TILE_SIZE;
-                victory = j * TILE_SIZE;
                 SDL_RenderCopy(ren, flag, NULL, &rect);
             }
         }

@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1648964015 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\main.cpp
+1649946274 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\main.cpp
 	"BasicFunction.h"
 	"GameObject.h"
 	"game_map.h"
@@ -7,11 +7,12 @@
 	"Character.h"
 	"Mob.h"
 	"Projectile.h"
+	"lp.h"
 
 1648522962 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.cpp
 	"BasicFunction.h"
 
-1648963915 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.h
+1649821923 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.h
 	<bits/stdc++.h>
 	<SDL.h>
 	<Windows.h>
@@ -25,10 +26,10 @@
 1647943531 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\gameobject.h
 	"BasicFunction.h"
 
-1648655066 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
+1649946231 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
 	"game_map.h"
 
-1648525294 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
+1649872644 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
 	"BasicFunction.h"
 	"GameObject.h"
 
@@ -39,7 +40,7 @@
 	"BasicFunction.h"
 	"GameObject.h"
 
-1648902392 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.cpp
+1649061555 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.cpp
 	"Character.h"
 
 1649061186 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.h
@@ -47,7 +48,7 @@
 	"BasicFunction.h"
 	"game_map.h"
 
-1648581785 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\mob.cpp
+1649061077 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\mob.cpp
 	"Mob.h"
 
 1649060984 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\mob.h
@@ -73,4 +74,12 @@
 	"Character.h"
 	"BasicFunction.h"
 	"GameObject.h"
+
+1649895669 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\lp.h
+	"BasicFunction.h"
+	"GameObject.h"
+	"game_map.h"
+
+1649945931 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\lp.cpp
+	"lp.h"
 

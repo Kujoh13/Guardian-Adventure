@@ -18,6 +18,8 @@ public:
     int info[41][301];
     int Map_X, Map_Y;
     int victory;
+    std::vector<int> get_lp_pos() {return lp_pos;}
+    void pop() {lp_pos.pop_back();}
 
 protected:
     std::vector<SDL_Texture*> Block;
@@ -28,7 +30,7 @@ protected:
     SDL_Texture* flag;
     int Num_Block;
     int Num_Bush;
-
+    std::vector<int> lp_pos;
 };
 
 Uint32 getpixel(SDL_Surface *surface, int x, int y);

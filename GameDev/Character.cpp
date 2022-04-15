@@ -104,10 +104,12 @@ bool Character::loadCharacter(std::string path, SDL_Renderer* renderer, int _id)
         file >> _died.first >> _died.second;
         file >> _victory.first >> _victory.second;
         file >> framePerAttack;
-        file >> frameAttack;
         file >> hp >> dmg;
         maxHp = hp;
-        file >> melee.x >> melee.y >> melee.w >> melee.h;
+        if(type == TYPE::MELEE){
+            file >> melee.x >> melee.y >> melee.w >> melee.h;
+            file >> frameAttack;
+        }
         file.close();
     }
 

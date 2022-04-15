@@ -50,6 +50,8 @@
 		<Unit filename="Screen.h" />
 		<Unit filename="game_map.cpp" />
 		<Unit filename="game_map.h" />
+		<Unit filename="lp.cpp" />
+		<Unit filename="lp.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

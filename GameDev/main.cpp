@@ -6,6 +6,7 @@
 #include "Character.h"
 #include "Mob.h"
 #include "Projectile.h"
+#include "lp.h"
 
 using namespace std;
 
@@ -35,8 +36,11 @@ Character _character[numCharacter];
 std::vector<Projectile> vProjectile;
 std::vector<Mob> vMob;
 std::vector<Item> vItem;
+std::vector<lp> v_lp;
 SDL_Texture* pr[numProjectile];
 SDL_Texture* itemDrop[3];
+SDL_Texture* lpTexture;
+SDL_Texture* lp_Animation[3];
 int pr_w[numProjectile];
 int pr_h[numProjectile];
 game_map* MAP = new game_map;
@@ -84,6 +88,14 @@ bool loadLevel(int level)
         if(!vMob[i].loadMob(map_path + int2str(vMob[i].getId()), gRenderer))
             return 0;
     }
+    lp new_lp;
+    new_lp.setType(1);
+    new_lp.setW(70);
+    new_lp.setH(70);
+    new_lp.setX(MAP->get_lp_pos().back());
+    MAP->pop();
+    new_lp.loadVar({4, 14}, {4, 11}, {4, 17});
+    v_lp.push_back(new_lp);
     return 1;
 }
 
@@ -134,14 +146,6 @@ int main(int argc, char* argv[]){
 
         SDL_FreeSurface(sf);
     }
-//    std::string path = "img/Projectile/info.txt";
-//
-//    ifstream file(path);
-//
-//    for(int i = 0; i < numProjectile; i++){
-//        file >> pr_w[i] >> pr_h[i];
-//    }
-//    file.close();
 
     //////////////
 
@@ -159,6 +163,21 @@ int main(int argc, char* argv[]){
     }
 
     //////////////
+
+    SDL_Surface* loadSurface = IMG_Load("img/lp.png");
+
+    lpTexture = SDL_CreateTextureFromSurface(gRenderer, loadSurface);
+
+    for(int i = 0; i < 3; i++)
+    {
+        std::string path = "img/lp" + int2str(i) + ".png";
+        loadSurface = IMG_Load(path.c_str());
+        lp_Animation[i] = SDL_CreateTextureFromSurface(gRenderer, loadSurface);
+    }
+
+    SDL_FreeSurface(loadSurface);
+
+    ///////////////
 
     int lastTime = 0, currentTime = 0;
 
@@ -195,6 +214,7 @@ int main(int argc, char* argv[]){
 
             if(idle)
                 _character[currentCharacter].setStatus(0);
+
             if(!_character[currentCharacter].getAttack())
                 _character[currentCharacter].setStatus(3);
 
@@ -206,6 +226,8 @@ int main(int argc, char* argv[]){
             else if(isRunning == 3){
                 scr.levelSelection(gRenderer);
                 MAP->setNumBlock(4);
+
+
 
                 vector<std::pair<SDL_Rect, int> > rectMob;
 
@@ -225,6 +247,16 @@ int main(int argc, char* argv[]){
                         swap(vItem[i], vItem.back());
                         vItem.pop_back();
                     }
+                }
+
+                if(MAP->get_lp_pos().size() && MAP->get_lp_pos().back() <= _character[currentCharacter].getX())
+                {
+                    lp new_lp;
+                    new_lp.setX(SCREEN_WIDTH);
+                    new_lp.setVelX(-5);
+                    new_lp.setType(0);
+                    MAP->pop();
+                    v_lp.push_back(new_lp);
                 }
 
                 if(vMob.size())
@@ -260,6 +292,18 @@ int main(int argc, char* argv[]){
                     }
                 }
 
+                if(v_lp.size()){
+                    for(int i = v_lp.size() - 1; i >= 0; i--)
+                    {
+                        v_lp[i].tick(_character[currentCharacter].getRect(), MAP);
+                        if(v_lp[i].get_done())
+                        {
+                            std::swap(v_lp[i], v_lp.back());
+                            v_lp.pop_back();
+                        }
+                    }
+                }
+
                 MAP->render(gRenderer, view);
 
                 for(int i = 0; i < vItem.size(); i++){
@@ -288,8 +332,6 @@ int main(int argc, char* argv[]){
                     SDL_RenderFillRect(gRenderer, &tRect);
 
                 }
-
-                //mob.show(gRenderer, view);
 
                 scr.ingame(gRenderer, _character[currentCharacter].getHp(), _character[currentCharacter].getDmg());
 
@@ -322,6 +364,17 @@ int main(int argc, char* argv[]){
 
                     SDL_RenderCopyEx(gRenderer, pr[vProjectile[i].getId()], NULL, &tRect, vProjectile[i].getAngle(), NULL, SDL_FLIP_NONE);
                 }
+
+                for(int i = 0; i < v_lp.size(); i++)
+                {
+                    if(v_lp[i].getType() == 1)
+                        v_lp[i].show(gRenderer, view, lp_Animation[v_lp[i].getStatus()]);
+                    else
+                        v_lp[i].show(gRenderer, view, lpTexture);
+                }
+
+                //SDL_RenderCopy(gRenderer, lpTexture, NULL, NULL);
+
             }
 
             SDL_RenderPresent(gRenderer);
@@ -333,6 +386,12 @@ int main(int argc, char* argv[]){
 
     for(int i = 0; i < numProjectile; i++)
         SDL_DestroyTexture(pr[i]);
+
+    SDL_DestroyTexture(lpTexture);
+
+    for(int i = 0; i < 3; i++)
+        SDL_DestroyTexture(lp_Animation[i]);
+
     close();
 
     return 0;

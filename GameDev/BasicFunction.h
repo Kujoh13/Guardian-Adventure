@@ -8,6 +8,7 @@
 #include <SDL_audio.h>
 #include <SDL_ttf.h>
 
+typedef std::pair<int, int> pii;
 
 static SDL_Window* gWindow = NULL;
 static SDL_Renderer* gRenderer = NULL;
