@@ -14,6 +14,7 @@ public:
     void tick(SDL_Rect character, game_map* MAP);
     void collisionX(game_map* MAP);
     void collisionY(game_map* MAP);
+    void dropItem(std::vector<Item>& vItem, int numCoin, int numGem);
     void setId(int _id) {id = _id;}
     int getId() {return id;}
     void setVal(int _val) {val = _val;}
@@ -23,6 +24,12 @@ public:
 protected:
     bool fell;
     int id;
+    enum ID{
+        COIN = 0,
+        GEM = 1,
+        MANA = 2,
+        TREASURE = 3,
+    };
     int val;
 };
 

@@ -20,6 +20,7 @@ public:
     int victory;
     std::vector<int> get_lp_pos() {return lp_pos;}
     void pop() {lp_pos.pop_back();}
+    int numCoin, numGem;
 
 protected:
     std::vector<SDL_Texture*> Block;

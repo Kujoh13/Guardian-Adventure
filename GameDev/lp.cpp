@@ -9,6 +9,7 @@ lp::lp()
     frame = 0;
     type = TYPE::FLOATING;
     done = false;
+    dropped = false;
 }
 
 lp::~lp()
@@ -23,7 +24,7 @@ void lp::loadVar(pii _idle_, pii _move_, pii _victory_)
     _victory = _victory_;
 }
 
-void lp::tick(SDL_Rect character, game_map* MAP)
+void lp::tick(SDL_Rect character, game_map* MAP, std::vector<Item>& vItem)
 {
     rect.x += velX;
 
@@ -50,6 +51,20 @@ void lp::tick(SDL_Rect character, game_map* MAP)
             velX = 0;
             if(status != STATUS::VICTORY) frame = 0;
             status = STATUS::VICTORY;
+        }
+    }
+    else
+    {
+        if(rect.x <= SCREEN_WIDTH / 2 && dropped == false)
+        {
+            Item nItem;
+            nItem.setId(3);
+            nItem.setX(std::max(character.x, SCREEN_WIDTH / 2));
+            nItem.setY(0);
+            nItem.setW(40);
+            nItem.setH(40);
+            vItem.push_back(nItem);
+            dropped = true;
         }
     }
 }
@@ -82,9 +97,7 @@ void lp::show(SDL_Renderer* renderer, int view, SDL_Texture* texture)
         temp = _victory;
 
     SDL_Rect nRect = {0, 0, charSize, charSize};
-    SDL_Rect tRect = {rect.x - 75 - view - 20, rect.y - 90, charSize, charSize};
-
-    SDL_RenderDrawRect(renderer, &tRect);
+    SDL_Rect tRect = {rect.x - charSize / 3 - view, rect.y - charSize / 3 - (charSize / 3 - rect.h), charSize, charSize};
 
     nRect.x = (frame % temp.first) * charSize;
     nRect.y = (frame / temp.first) * charSize;

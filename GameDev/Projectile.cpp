@@ -7,22 +7,12 @@ Projectile::Projectile()
     curTime = 0;
     lastTime = 50;
     speed = 15;
+    hostile = false;
+    radius = 0;
 }
 Projectile::~Projectile()
 {
     Free();
-}
-
-bool Projectile::collide(Character* character)
-{
-    SDL_Rect hitbox = getHitBox();
-
-    if(collision(hitbox, character->getRect()))
-    {
-        character->setHp(character->getHp() - dmg);
-        return 1;
-    }
-    return 0;
 }
 
 void Projectile::tick()
@@ -41,7 +31,7 @@ void Projectile::shoot(SDL_Rect finish, SDL_Rect start, int _id, int _dmg)
     dmg = _dmg;
 
     rect.x = (2 * start.x + start.w) / 2;
-    rect.y = (2 * start.y + start.h) / 2;
+    rect.y = start.y;
 
     int x = (2 * finish.x + finish.w - 2 * start.x - start.w) / 2;
     int y = (2 * finish.y + finish.h - 2 * start.y - start.h) / 2;
@@ -74,16 +64,6 @@ SDL_Rect Projectile::getHitBox(int view)
 SDL_Rect Projectile::getHitBox()
 {
     return {rect.x, rect.y + rect.h / 3, rect.w, rect.h / 3};
-}
-
-void Projectile::setSpeed(double _speed)
-{
-    speed = _speed;
-}
-
-void Projectile::addCurTime()
-{
-    curTime++;
 }
 
 bool Projectile::done()

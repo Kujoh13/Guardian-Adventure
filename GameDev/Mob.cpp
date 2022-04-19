@@ -105,7 +105,7 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
 void Mob::drawIdle(SDL_Renderer* renderer, int view)
 {
     SDL_Rect nRect = {0, 0, charSize, charSize};
-    SDL_Rect tRect = {rect.x - 75 - view - 50 * facing, rect.y - 75, charSize, charSize};
+    SDL_Rect tRect = {rect.x - charSize / 3 - view - (charSize / 3 - rect.w) * facing, rect.y - charSize / 3 - (charSize / 3 - rect.h), charSize, charSize};
 
     nRect.x = (frame % _idle.first) * charSize;
     nRect.y = (frame / _idle.first) * charSize;
@@ -119,7 +119,7 @@ void Mob::drawIdle(SDL_Renderer* renderer, int view)
 void Mob::drawMove(SDL_Renderer* renderer, int view)
 {
     SDL_Rect nRect = {0, 0, charSize, charSize};
-    SDL_Rect tRect = {rect.x - 75 - view - 50 * facing, rect.y - 75, charSize, charSize};
+    SDL_Rect tRect = {rect.x - charSize / 3 - view - (charSize / 3 - rect.w) * facing, rect.y - charSize / 3 - (charSize / 3 - rect.h), charSize, charSize};
 
     nRect.x = (frame % _move.first) * charSize;
     nRect.y = (frame / _move.first) * charSize;
@@ -131,7 +131,7 @@ void Mob::drawMove(SDL_Renderer* renderer, int view)
 void Mob::drawAttack(SDL_Renderer* renderer, int view)
 {
     SDL_Rect nRect = {0, 0, charSize, charSize};
-    SDL_Rect tRect = {rect.x - 75 - view - 50 * facing, rect.y - 75, charSize, charSize};
+    SDL_Rect tRect = {rect.x - charSize / 3 - view - (charSize / 3 - rect.w) * facing, rect.y - charSize / 3 - (charSize / 3 - rect.h), charSize, charSize};
 
     nRect.x = (frame % _attack.first) * charSize;
     nRect.y = (frame / _attack.first) * charSize;
@@ -193,6 +193,7 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
     {
         Projectile temp;
         temp.shoot(character->getRect(), rect, idProjectile, dmg);
+        temp.setHostile(true);
         vProjectile.push_back(temp);
     }
 

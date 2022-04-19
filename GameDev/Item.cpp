@@ -24,7 +24,7 @@ void Item::tick(SDL_Rect character, game_map* MAP)
         collisionX(MAP);
 
     }
-    else{
+    else if(id != ID::TREASURE){
         double X = (2 * character.x + character.w - 2 * rect.x - rect.w) / 2;
         double Y = (2 * character.y + character.h - 2 * rect.y - rect.h) / 2;
 
@@ -33,6 +33,40 @@ void Item::tick(SDL_Rect character, game_map* MAP)
 
         rect.x += velX;
         rect.y += velY;
+    }
+}
+
+void Item::dropItem(std::vector<Item>& vItem, int numCoin, int numGem)
+{
+    for(int i = 0; i < std::min(numCoin, 10); i++)
+    {
+        Item nItem;
+        nItem.setX((rect.x * 2 + rect.w) / 2);
+        nItem.setY((rect.y * 2 + rect.h) / 2);
+        nItem.setVelY(-30);
+        nItem.setVelX(Rand(-10, 10));
+        nItem.setW(30);
+        nItem.setH(30);
+        nItem.setId(ID::COIN);
+        int val = numCoin / 10;
+        if(i < numCoin % 10) val++;
+        nItem.setVal(val);
+        vItem.push_back(nItem);
+    }
+    for(int i = 0; i < std::min(numGem, 10); i++)
+    {
+        Item nItem;
+        nItem.setX((rect.x * 2 + rect.w) / 2);
+        nItem.setY((rect.y * 2 + rect.h) / 2);
+        nItem.setVelY(-30);
+        nItem.setVelX(Rand(-10, 10));
+        nItem.setW(30);
+        nItem.setH(30);
+        nItem.setId(ID::GEM);
+        int val = numGem / 10;
+        if(i < numGem % 10) val++;
+        nItem.setVal(val);
+        vItem.push_back(nItem);
     }
 }
 

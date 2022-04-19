@@ -48,10 +48,10 @@ void Screen::loadTexture(SDL_Renderer* renderer)
     exit_button[1].setX(450);
     exit_button[1].setY(542);
 
-    hpIcon.setX(5 + portraitSize);
+    hpIcon.setX(15 + portraitSize);
     hpIcon.setY(20);
 
-    dmgIcon.setX(5 + portraitSize);
+    dmgIcon.setX(15 + portraitSize);
     dmgIcon.setY(70);
 
 }

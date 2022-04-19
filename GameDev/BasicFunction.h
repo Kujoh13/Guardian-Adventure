@@ -41,8 +41,9 @@ const double gravity = 3;
 const double MAX_FALL_SPEED = 25;
 const double MAX_RUN_SPEED = 10;
 
-const int numCharacter = 1;
-const int charSize = 240;
+const int numCharacter = 2;
+const int numItem = 4;
+const int charSize = 300;
 const int charWidth = 40;
 const int charHeight = 85;
 const int portraitSize = 100;

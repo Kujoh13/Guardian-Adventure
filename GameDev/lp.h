@@ -4,6 +4,7 @@
 #include "BasicFunction.h"
 #include "GameObject.h"
 #include "game_map.h"
+#include "Item.h"
 
 class lp : public GameObject
 {
@@ -11,7 +12,7 @@ public:
     lp();
     ~lp();
     void loadVar(pii _idle_, pii _move_, pii _victory_);
-    void tick(SDL_Rect character, game_map* MAP);
+    void tick(SDL_Rect character, game_map* MAP, std::vector<Item>& vItem);
     void show(SDL_Renderer* renderer, int view, SDL_Texture* texture);
     void collisionY(game_map* MAP);
     bool get_done() {return done;}
@@ -34,6 +35,7 @@ protected:
     int frame;
     pii _idle, _move, _victory;
     bool done;
+    bool dropped;
 };
 
 #endif // LP_H_

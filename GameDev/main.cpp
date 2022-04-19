@@ -35,10 +35,10 @@ Character _character[numCharacter];
 
 std::vector<Projectile> vProjectile;
 std::vector<Mob> vMob;
-std::vector<Item> vItem;
+std::vector<Item> vItem, vItem_temp;
 std::vector<lp> v_lp;
 SDL_Texture* pr[numProjectile];
-SDL_Texture* itemDrop[3];
+SDL_Texture* itemDrop[numItem];
 SDL_Texture* lpTexture;
 SDL_Texture* lp_Animation[3];
 int pr_w[numProjectile];
@@ -81,6 +81,8 @@ bool loadLevel(int level)
         }
     }
 
+    fileMob >> MAP->numCoin;
+    fileMob >> MAP->numGem;
 
     fileMob.close();
 
@@ -114,7 +116,7 @@ int main(int argc, char* argv[]){
     3. In a level
     **/
     int currentLevel = 1;
-    int currentCharacter = 0;
+    int currentCharacter = 1;
 
     if(!loadLevel(1))
         return -1;
@@ -149,7 +151,7 @@ int main(int argc, char* argv[]){
 
     //////////////
 
-    for(int i = 0; i < 3; i++){
+    for(int i = 0; i < numItem; i++){
         std::string path = "img/item" + int2str(i) + ".png";
 
         SDL_Surface* sf = IMG_Load(path.c_str());
@@ -227,8 +229,6 @@ int main(int argc, char* argv[]){
                 scr.levelSelection(gRenderer);
                 MAP->setNumBlock(4);
 
-
-
                 vector<std::pair<SDL_Rect, int> > rectMob;
 
                 for(int i = 0; i < vMob.size(); i++)
@@ -236,7 +236,7 @@ int main(int argc, char* argv[]){
                     rectMob.push_back({vMob[i].getRect(), vMob[i].getHp()});
                 }
 
-                _character[currentCharacter].tick(MAP, rectMob);
+                _character[currentCharacter].tick(MAP, rectMob, vProjectile);
 
                 if(vItem.size())
                 for(int i = vItem.size() - 1; i >= 0; i--)
@@ -244,9 +244,17 @@ int main(int argc, char* argv[]){
                     vItem[i].tick(_character[currentCharacter].getRect(), MAP);
                     if(collision(vItem[i].getRect(), _character[currentCharacter].getRect()) && vItem[i].getFell())
                     {
+                        if(vItem[i].getId() == 3)
+                            vItem[i].dropItem(vItem_temp, Rand(1, MAP->numCoin), Rand(1, MAP->numGem));
                         swap(vItem[i], vItem.back());
                         vItem.pop_back();
                     }
+                }
+
+                while(vItem_temp.size())
+                {
+                    vItem.push_back(vItem_temp.back());
+                    vItem_temp.pop_back();
                 }
 
                 if(MAP->get_lp_pos().size() && MAP->get_lp_pos().back() <= _character[currentCharacter].getX())
@@ -285,17 +293,42 @@ int main(int argc, char* argv[]){
                 for(int i = vProjectile.size() - 1; i >= 0 ; i--)
                 {
                     vProjectile[i].tick();
-                    if(vProjectile[i].done() || vProjectile[i].collide(&_character[currentCharacter]))
+                    if(vProjectile[i].done())
                     {
                         swap(vProjectile[i], vProjectile.back());
                         vProjectile.pop_back();
+                    }
+                    else if(vProjectile[i].getHostile())
+                    {
+                        if(collision(vProjectile[i].getHitBox(), _character[currentCharacter].getRect()))
+                        {
+                            int curHp = _character[currentCharacter].getHp() - vProjectile[i].getDmg();
+                            _character[currentCharacter].setHp(curHp);
+                            swap(vProjectile[i], vProjectile.back());
+                            vProjectile.pop_back();
+                        }
+                    }
+                    else if(!vProjectile[i].getHostile())
+                    {
+                        if(vMob.size())
+                        for(int j = vMob.size() - 1; j >= 0; j--)
+                        {
+                            if(collision(rectMob[j].first, vProjectile[i].getHitBox()))
+                            {
+                                rectMob[j].second = std::max(0, rectMob[j].second - vProjectile[i].getDmg());
+                                vMob[j].setHp(rectMob[j].second);
+                                swap(vProjectile[i], vProjectile.back());
+                                vProjectile.pop_back();
+                                break;
+                            }
+                        }
                     }
                 }
 
                 if(v_lp.size()){
                     for(int i = v_lp.size() - 1; i >= 0; i--)
                     {
-                        v_lp[i].tick(_character[currentCharacter].getRect(), MAP);
+                        v_lp[i].tick(_character[currentCharacter].getRect(), MAP, vItem);
                         if(v_lp[i].get_done())
                         {
                             std::swap(v_lp[i], v_lp.back());
@@ -373,7 +406,7 @@ int main(int argc, char* argv[]){
                         v_lp[i].show(gRenderer, view, lpTexture);
                 }
 
-                //SDL_RenderCopy(gRenderer, lpTexture, NULL, NULL);
+                //SDL_RenderCopy(gRenderer, itemDrop[3], NULL, NULL);
 
             }
 

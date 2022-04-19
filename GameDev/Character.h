@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "BasicFunction.h"
 #include "game_map.h"
+#include "Projectile.h"
 
 class Character : public GameObject
 {
@@ -13,7 +14,7 @@ public:
     void show(SDL_Renderer* renderer, int view);
     void handleInput(SDL_Event event);
     bool loadCharacter(std::string path, SDL_Renderer* renderer, int _id);
-    void tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rectMob);
+    void tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rectMob, std::vector<Projectile>& vProjectile);
     void collisionX(game_map* MAP);
     void collisionY(game_map* MAP);
     void drawIdle(SDL_Renderer* renderer, int view);
@@ -70,6 +71,7 @@ protected:
     int nextAttack, framePerAttack, frameAttack;
     bool facing;
     int type;
+    int idProjectile, prSpeed;
 
     enum TYPE{
         RANGED = 0,
