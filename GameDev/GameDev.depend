@@ -1,13 +1,6 @@
 # depslib dependency file v1.0
-1650355337 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\main.cpp
-	"BasicFunction.h"
-	"GameObject.h"
-	"game_map.h"
-	"Screen.h"
-	"Character.h"
-	"Mob.h"
-	"Projectile.h"
-	"lp.h"
+1650471217 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\main.cpp
+	"Handler.h"
 
 1648522962 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.cpp
 	"BasicFunction.h"
@@ -29,7 +22,7 @@
 1649946231 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
 	"game_map.h"
 
-1650020479 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
+1650471530 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
 	"BasicFunction.h"
 	"GameObject.h"
 
@@ -83,4 +76,18 @@
 
 1650363135 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\lp.cpp
 	"lp.h"
+
+1650471031 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\handler.h
+	"bits/stdc++.h"
+	"BasicFunction.h"
+	"GameObject.h"
+	"game_map.h"
+	"Screen.h"
+	"Character.h"
+	"Mob.h"
+	"Projectile.h"
+	"lp.h"
+
+1650471436 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\handler.cpp
+	"Handler.h"
 

@@ -40,6 +40,8 @@
 		<Unit filename="Character.h" />
 		<Unit filename="GameObject.cpp" />
 		<Unit filename="GameObject.h" />
+		<Unit filename="Handler.cpp" />
+		<Unit filename="Handler.h" />
 		<Unit filename="Item.cpp" />
 		<Unit filename="Item.h" />
 		<Unit filename="Mob.cpp" />
