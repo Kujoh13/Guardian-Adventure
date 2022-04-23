@@ -18,7 +18,15 @@ bool operator == (SDL_Color a, SDL_Color b)
 
 bool collision(SDL_Rect A, SDL_Rect B)
 {
-    return !(A.x >= B.x + B.w || A.x + A.w <= B.x || A.y >= B.y + B.h || A.y + A.w <= B.y);
+    return !(A.x > B.x + B.w || A.x + A.w < B.x || A.y > B.y + B.h || A.y + A.h < B.y);
+}
+
+double distance(SDL_Rect A, SDL_Rect B)
+{
+    double x = (2 * A.x + A.w - 2 * B.x - B.w) / 2;
+    double y = (2 * A.y + A.h - 2 * B.y - B.h) / 2;
+
+    return sqrt(x * x + y * y);
 }
 
 std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch().count());

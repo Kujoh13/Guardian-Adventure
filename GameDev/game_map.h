@@ -15,9 +15,17 @@ public:
     int getNumBlock(int _NumBlock);
     void setNumBush(int _NumBush);
     int getNumBush(int _NumBush);
-    int info[41][301];
-    int Map_X, Map_Y;
-    int victory;
+
+    void setNumCoin(int _numCoin) {numCoin = _numCoin;}
+    int getNumCoin() {return numCoin;}
+
+    void setNumGem(int _numGem) {numGem = _numGem;}
+    int getNumGem() {return numGem;}
+
+    int **getInfo() {return info;}
+    int getVictory() {return victory;}
+    int getMapWidth() {return Map_Width;}
+    int getMapHeight() {return Map_Height;}
     std::vector<int> get_lp_pos() {return lp_pos;}
     void pop() {lp_pos.pop_back();}
     int numCoin, numGem;
@@ -32,6 +40,11 @@ protected:
     int Num_Block;
     int Num_Bush;
     std::vector<int> lp_pos;
+    int Map_Width, Map_Height;
+    int victory;
+    int** info;
+    int* bush_width;
+    int* bush_height;
 };
 
 Uint32 getpixel(SDL_Surface *surface, int x, int y);

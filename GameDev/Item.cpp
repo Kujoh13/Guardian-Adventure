@@ -68,6 +68,21 @@ void Item::dropItem(std::vector<Item>& vItem, int numCoin, int numGem)
         nItem.setVal(val);
         vItem.push_back(nItem);
     }
+
+    int t = Rand(1, 1);
+    if(t == 1)
+    {
+        Item nItem;
+        nItem.setX((rect.x * 2 + rect.w) / 2);
+        nItem.setY((rect.y * 2 + rect.h) / 2);
+        nItem.setVelY(-30);
+        nItem.setVelX(Rand(-10, 10));
+        nItem.setW(30);
+        nItem.setH(30);
+        nItem.setId(ID::HEART);
+        nItem.setVal(1);
+        vItem.push_back(nItem);
+    }
 }
 
 void Item::collisionX(game_map* MAP)
@@ -79,7 +94,7 @@ void Item::collisionX(game_map* MAP)
     int pos_y2 = (rect.y + rect.h) / TILE_SIZE;
 
     for(int i = pos_y1; i <= pos_y2; i++)
-        if(MAP->info[i][pos_x1])
+        if(MAP->getInfo()[i][pos_x1])
         {
             rect.x = (pos_x1 + 1) * TILE_SIZE;
             break;
@@ -91,9 +106,9 @@ void Item::collisionX(game_map* MAP)
     pos_y2 = (rect.y + rect.h) / TILE_SIZE;
 
     for(int i = pos_y1; i <= pos_y2; i++)
-        if(MAP->info[i][pos_x2])
+        if(MAP->getInfo()[i][pos_x2])
         {
-            rect.x = pos_x2 * TILE_SIZE - rect.x - 1;
+            rect.x = pos_x2 * TILE_SIZE - rect.w - 1;
             break;
         }
 
@@ -108,7 +123,7 @@ void Item::collisionY(game_map* MAP)
     int pos_y2 = (rect.y + rect.h) / TILE_SIZE;
 
     for(int i = pos_x1; i <= pos_x2; i++)
-        if(MAP->info[pos_y1][i])
+        if(MAP->getInfo()[pos_y1][i])
         {
             rect.y = (pos_y1 + 1) * TILE_SIZE;
             break;
@@ -120,7 +135,7 @@ void Item::collisionY(game_map* MAP)
     pos_y2 = (rect.y + rect.h + 1) / TILE_SIZE;
 
     for(int i = pos_x1; i <= pos_x2; i++)
-        if(MAP->info[pos_y2][i])
+        if(MAP->getInfo()[pos_y2][i])
         {
             ok = 1;
             rect.y = pos_y2 * TILE_SIZE - rect.h - 1;

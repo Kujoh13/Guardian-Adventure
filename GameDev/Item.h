@@ -27,7 +27,7 @@ protected:
     enum ID{
         COIN = 0,
         GEM = 1,
-        MANA = 2,
+        HEART = 2,
         TREASURE = 3,
     };
     int val;

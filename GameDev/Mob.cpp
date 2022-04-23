@@ -18,6 +18,7 @@ Mob::Mob()
     hp = 0;
     mobId = 0;
     hostile = true;
+    weapon = 0;
 
     _idle = {0, 0};
     _move = {0, 0};
@@ -42,6 +43,35 @@ Mob::~Mob()
 }
 bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
 {
+    std::ifstream file(path + "/mob_info.txt");
+
+    if(!file.is_open())
+        return false;
+
+    file >> _idle.first >> _idle.second;
+    file >> _move.first >> _move.second;
+    file >> _attack.first >> _attack.second;
+    file >> framePerAttack;
+    file >> idProjectile;
+    file >> rect.w >> rect.h;
+    file >> hp >> dmg;
+    maxHp = hp;
+    file >> type;
+    file >> velX;
+    file >> weapon;
+    if(type == TYPE::MELEE){
+        file >> melee.x >> melee.y >> melee.w >> melee.h;
+        file >> frameAttack;
+    }
+    else{
+        file >> prSpeed;
+        if(s[weapon] == "bomb") file >> prRadius;
+        std::cout << s[weapon] <<'\n';
+    }
+    file >> itemDrop[0];
+    file.close();
+
+
     SDL_Surface* loadedSurface;
 
     for(int i = 0; i <= 1; i++){
@@ -72,30 +102,6 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
         }
         else std::cout << SDL_GetError() << '\n';
     }
-
-
-    std::ifstream file(path + "/mob_info.txt");
-
-    if(!file.is_open())
-        return false;
-
-    file >> _idle.first >> _idle.second;
-    file >> _move.first >> _move.second;
-    file >> _attack.first >> _attack.second;
-    file >> framePerAttack;
-    file >> idProjectile;
-    file >> rect.w >> rect.h;
-    file >> hp >> dmg;
-    maxHp = hp;
-    file >> type;
-    file >> velX;
-    file >> hostile;
-    if(type == TYPE::MELEE){
-        file >> melee.x >> melee.y >> melee.w >> melee.h;
-        file >> frameAttack;
-    }
-    file >> itemDrop[0];
-    file.close();
 
     SDL_FreeSurface(loadedSurface);
 
@@ -143,6 +149,25 @@ void Mob::show(SDL_Renderer* renderer, int view)
 {
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+    SDL_Rect nRect = rect;
+    nRect.x -= view;
+
+    SDL_RenderDrawRect(renderer, &nRect);
+
+    if(type == TYPE::MELEE){
+        SDL_Rect tempRect = rect;
+        tempRect.x += melee.x;
+        tempRect.y += melee.y;
+        tempRect.w = melee.w;
+        tempRect.h = melee.h;
+
+        if(facing) tempRect.x -= melee.w - rect.w;
+
+        tempRect.x -= view;
+
+        SDL_RenderDrawRect(renderer, &tempRect);
+    }
 
     if(nextAttack >= _attack.second){
         if(nextAttack == _attack.second) frame = 0;
@@ -192,7 +217,9 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
     if(nextAttack == 0 && type == TYPE::RANGED)
     {
         Projectile temp;
-        temp.shoot(character->getRect(), rect, idProjectile, dmg);
+        if(s[weapon] == "bomb") temp.setThrew(true);
+        if(s[weapon] == "bomb") temp.setRadius(prRadius);
+        temp.shoot(character->getRect(), rect, idProjectile, dmg, prSpeed);
         temp.setHostile(true);
         vProjectile.push_back(temp);
     }
@@ -241,7 +268,7 @@ void Mob::collisionX(game_map* MAP)
     int pos_y2 = (rect.y + rect.h) / TILE_SIZE;
 
     for(int i = pos_y1; i <= pos_y2; i++)
-        if(MAP->info[i][pos_x1])
+        if(MAP->getInfo()[i][pos_x1])
         {
             rect.x = (pos_x1 + 1) * TILE_SIZE;
             break;
@@ -253,9 +280,9 @@ void Mob::collisionX(game_map* MAP)
     pos_y2 = (rect.y + rect.h) / TILE_SIZE;
 
     for(int i = pos_y1; i <= pos_y2; i++)
-        if(MAP->info[i][pos_x2])
+        if(MAP->getInfo()[i][pos_x2])
         {
-            rect.x = pos_x2 * TILE_SIZE - charWidth - 1;
+            rect.x = pos_x2 * TILE_SIZE - rect.w - 1;
             break;
         }
 
@@ -270,7 +297,7 @@ void Mob::collisionY(game_map* MAP)
     int pos_y2 = (rect.y + rect.h) / TILE_SIZE;
 
     for(int i = pos_x1; i <= pos_x2; i++)
-        if(MAP->info[pos_y1][i])
+        if(MAP->getInfo()[pos_y1][i])
         {
             rect.y = (pos_y1 + 1) * TILE_SIZE;
             break;
@@ -282,10 +309,10 @@ void Mob::collisionY(game_map* MAP)
     pos_y2 = (rect.y + rect.h + 1) / TILE_SIZE;
 
     for(int i = pos_x1; i <= pos_x2; i++)
-        if(MAP->info[pos_y2][i])
+        if(MAP->getInfo()[pos_y2][i])
         {
             ok = 0;
-            rect.y = pos_y2 * TILE_SIZE - charHeight - 1;
+            rect.y = pos_y2 * TILE_SIZE - rect.h - 1;
             break;
         }
 }

@@ -2,9 +2,23 @@
 
 Handler::Handler()
 {
-////    isRunning = 2;
-////    current_character = 0;
-////    current_level = 1;
+    isRunning = 2;
+    current_character = 0;
+    current_level = 2;
+    for(int i = 0; i < numItem; i++)
+        itemDrop[i] = NULL;
+
+    for(int i = 0; i < numProjectile; i++)
+        pr[i] = NULL;
+
+    lpTexture = NULL;
+
+    for(int i = 0; i < 3; i++)
+        lp_Animation[i] = NULL;
+
+    explosion = NULL;
+
+    MAP = new game_map;
 }
 
 Handler::~Handler()
@@ -22,14 +36,15 @@ Handler::~Handler()
 
     for(int i = 0; i < 3; i++)
         SDL_DestroyTexture(lp_Animation[i]);
+
+    SDL_DestroyTexture(explosion);
 }
 
-void Handler::tick(SDL_Renderer* renderer, SDL_Event event)
+void Handler::tick(SDL_Renderer* renderer)
 {
     bool idle = true;
     while(SDL_PollEvent(&event))
     {
-
         if(event.type == SDL_QUIT)
         {
             isRunning = 0;
@@ -43,13 +58,12 @@ void Handler::tick(SDL_Renderer* renderer, SDL_Event event)
             }
         }
         else if(isRunning == 2){
-            loadLevel(1, renderer);
+            loadLevel(current_level, renderer);
             isRunning = 3;
         }
         else if(isRunning == 3){
-            _character[current_character].handleInput(gEvent);
-            idle = false;
-
+            if(_character[current_character].handleInput(event))
+                idle = false;
         }
 
     }
@@ -66,13 +80,9 @@ void Handler::tick(SDL_Renderer* renderer, SDL_Event event)
         scr.startScreen(renderer);
     }
     else if(isRunning == 3){
-        scr.levelSelection(renderer);
-        MAP->setNumBlock(4);
 
         for(int i = 0; i < vMob.size(); i++)
-        {
             rectMob.push_back({vMob[i].getRect(), vMob[i].getHp()});
-        }
 
         _character[current_character].tick(MAP, rectMob, vProjectile);
 
@@ -84,6 +94,11 @@ void Handler::tick(SDL_Renderer* renderer, SDL_Event event)
             {
                 if(vItem[i].getId() == 3)
                     vItem[i].dropItem(vItem_temp, Rand(1, MAP->numCoin), Rand(1, MAP->numGem));
+                else if(vItem[i].getId() == 2)
+                {
+                    int nHp = std::min(_character[current_character].getMaxHp(), _character[current_character].getHp() + vItem[i].getVal());
+                    _character[current_character].setHp(nHp);
+                }
                 std::swap(vItem[i], vItem.back());
                 vItem.pop_back();
             }
@@ -120,9 +135,67 @@ void Handler::tick(SDL_Renderer* renderer, SDL_Event event)
             else
                 vMob[i].tick(MAP, vProjectile, &_character[current_character]);
         }
+        if(vProjectile.size())
+        for(int i = vProjectile.size() - 1; i >= 0 ; i--)
+        {
+            vProjectile[i].tick(MAP);
+            if(vProjectile[i].done())
+            {
+                if(distance(vProjectile[i].getHitBox(), _character[current_character].getRect()) <= vProjectile[i].getRadius())
+                {
+                    int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
+                    _character[current_character].setHp(curHp);
+                }
+                vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
+                std::swap(vProjectile[i], vProjectile.back());
+                vProjectile.pop_back();
+            }
+            else if(vProjectile[i].getHostile())
+            {
+                if(collision(vProjectile[i].getHitBox(), _character[current_character].getRect()))
+                {
+                    int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
+                    _character[current_character].setHp(curHp);
+                    if(vProjectile[i].getThrew())
+                    {
+                        vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
+                    }
+                    std::swap(vProjectile[i], vProjectile.back());
+                    vProjectile.pop_back();
+                }
+            }
+            else if(!vProjectile[i].getHostile())
+            {
+                if(vMob.size())
+                for(int j = vMob.size() - 1; j >= 0; j--)
+                {
 
+                    if(collision(rectMob[j].first, vProjectile[i].getHitBox()))
+                    {
+                        rectMob[j].second = std::max(0, rectMob[j].second - vProjectile[i].getDmg());
+                        vMob[j].setHp(rectMob[j].second);
+                        std::swap(vProjectile[i], vProjectile.back());
+                        vProjectile.pop_back();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if(v_lp.size()){
+            for(int i = v_lp.size() - 1; i >= 0; i--)
+            {
+                v_lp[i].tick(_character[current_character].getRect(), MAP, vItem);
+                if(v_lp[i].get_done())
+                {
+                    std::swap(v_lp[i], v_lp.back());
+                    v_lp.pop_back();
+                }
+            }
+        }
         rectMob.clear();
     }
+
 }
 
 void Handler::show(SDL_Renderer* renderer)
@@ -130,54 +203,6 @@ void Handler::show(SDL_Renderer* renderer)
     if(_character[current_character].getX() >= SCREEN_WIDTH / 2)
         view = _character[current_character].getX() - (SCREEN_WIDTH / 2);
     else view = 0;
-
-    if(vProjectile.size())
-    for(int i = vProjectile.size() - 1; i >= 0 ; i--)
-    {
-        vProjectile[i].tick();
-        if(vProjectile[i].done())
-        {
-            std::swap(vProjectile[i], vProjectile.back());
-            vProjectile.pop_back();
-        }
-        else if(vProjectile[i].getHostile())
-        {
-            if(collision(vProjectile[i].getHitBox(), _character[current_character].getRect()))
-            {
-                int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
-                _character[current_character].setHp(curHp);
-                std::swap(vProjectile[i], vProjectile.back());
-                vProjectile.pop_back();
-            }
-        }
-        else if(!vProjectile[i].getHostile())
-        {
-            if(vMob.size())
-            for(int j = vMob.size() - 1; j >= 0; j--)
-            {
-                if(collision(rectMob[j].first, vProjectile[i].getHitBox()))
-                {
-                    rectMob[j].second = std::max(0, rectMob[j].second - vProjectile[i].getDmg());
-                    vMob[j].setHp(rectMob[j].second);
-                    std::swap(vProjectile[i], vProjectile.back());
-                    vProjectile.pop_back();
-                    break;
-                }
-            }
-        }
-    }
-
-    if(v_lp.size()){
-        for(int i = v_lp.size() - 1; i >= 0; i--)
-        {
-            v_lp[i].tick(_character[current_character].getRect(), MAP, vItem);
-            if(v_lp[i].get_done())
-            {
-                std::swap(v_lp[i], v_lp.back());
-                v_lp.pop_back();
-            }
-        }
-    }
 
     MAP->render(renderer, view);
 
@@ -237,6 +262,8 @@ void Handler::show(SDL_Renderer* renderer)
         SDL_Rect tRect = vProjectile[i].getRect();
         tRect.x -= view;
 
+        SDL_RenderDrawRect(renderer, &tRect);
+
         SDL_RenderCopyEx(renderer, pr[vProjectile[i].getId()], NULL, &tRect, vProjectile[i].getAngle(), NULL, SDL_FLIP_NONE);
     }
 
@@ -247,17 +274,30 @@ void Handler::show(SDL_Renderer* renderer)
         else
             v_lp[i].show(renderer, view, lpTexture);
     }
+    if(vExplosion.size())
+    for(int i = vExplosion.size() - 1; i >= 0; i--){
+        SDL_Rect tRect = vExplosion[i].first;
+        int r = vExplosion[i].second.first;
+        tRect.x = (2 * vExplosion[i].first.x + vExplosion[i].first.w) / 2 - sqrt(2) / 2 * r - view;
+        tRect.y = (2 * vExplosion[i].first.y + vExplosion[i].first.h) / 2 - sqrt(2) / 2 * r;
+        tRect.w = sqrt(2) * r;
+        tRect.h = sqrt(2) * r;
+        SDL_RenderCopy(renderer, explosion, NULL, &tRect);
+        vExplosion[i].second.second--;
+        if(vExplosion[i].second.second == 0)
+        {
+            std::swap(vExplosion[i], vExplosion.back());
+            vExplosion.pop_back();
+        }
+    }
 
     SDL_RenderPresent(renderer);
 
 }
 
-
-
 bool Handler::loadLevel(int level, SDL_Renderer* renderer)
 {
-    bool ret = MAP->loadMap("img", renderer, level);
-    if(!ret)
+    if(!MAP->loadMap("img", renderer, level))
         return false;
 
     std::string map_path = "img/Level_" + int2str(level) + "/";
@@ -274,31 +314,36 @@ bool Handler::loadLevel(int level, SDL_Renderer* renderer)
             for(int j = 0; j < numMob; j++)
             {
                 Mob mob;
-                int x, y, w;
-                fileMob >> x >> y >> w;
-                mob.setWeapon(w);
+                int x, y;
+                fileMob >> x >> y;
                 mob.setX(x);
                 mob.setY(y);
                 mob.setId(i);
                 int l, r;
                 fileMob >> l >> r;
                 mob.setRange(l, r);
-
                 vMob.push_back(mob);
 
             }
         }
     }
 
-    fileMob >> MAP->numCoin;
-    fileMob >> MAP->numGem;
+    int nCoin, nGem;
+
+    fileMob >> nCoin;
+    fileMob >> nGem;
+    MAP->setNumCoin(nCoin);
+    MAP->setNumGem(nGem);
 
     fileMob.close();
 
     for(int i = 0; i < vMob.size(); i++){
         if(!vMob[i].loadMob(map_path + int2str(vMob[i].getId()), renderer))
-            return 0;
+        {
+            return false;
+        }
     }
+
     lp new_lp;
     new_lp.setType(1);
     new_lp.setW(70);
@@ -307,6 +352,7 @@ bool Handler::loadLevel(int level, SDL_Renderer* renderer)
     MAP->pop();
     new_lp.loadVar({4, 14}, {4, 11}, {4, 17});
     v_lp.push_back(new_lp);
+
     return 1;
 }
 
@@ -341,6 +387,13 @@ void Handler::load(SDL_Renderer* renderer)
 
         SDL_FreeSurface(sf);
     }
+
+    std::string path = "img/explosion.png";
+    SDL_Surface* sf = IMG_Load(path.c_str());
+
+    explosion = SDL_CreateTextureFromSurface(renderer, sf);
+
+    SDL_FreeSurface(sf);
 
     //////////////
 

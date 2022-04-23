@@ -29,24 +29,24 @@ int main(int argc, char* argv[]){
 
     Handler handler;
 
-    //handler->load(gRenderer);
+    handler.load(gRenderer);
 
-//    int currentTime, lastTime = 0;
-//
-//    while(handler.get_is_running())
-//    {
-//        currentTime = SDL_GetTicks();
-//
-//        if(currentTime - lastTime >= 33){
-//
-//            //handler.tick(gRenderer, gEvent);
-//
-//            //handler.show(gRenderer);
-//
-//            lastTime = currentTime;
-//        }
-//
-//    }
+    int currentTime, lastTime = 0;
+
+    while(handler.get_is_running())
+    {
+        currentTime = SDL_GetTicks();
+
+        if(currentTime - lastTime >= 33){
+
+            handler.tick(gRenderer);
+
+            handler.show(gRenderer);
+
+            lastTime = currentTime;
+        }
+
+    }
 
     close();
 

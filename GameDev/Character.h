@@ -12,7 +12,7 @@ public:
     Character();
     ~Character();
     void show(SDL_Renderer* renderer, int view);
-    void handleInput(SDL_Event event);
+    bool handleInput(SDL_Event event);
     bool loadCharacter(std::string path, SDL_Renderer* renderer, int _id);
     void tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rectMob, std::vector<Projectile>& vProjectile);
     void collisionX(game_map* MAP);
@@ -66,7 +66,7 @@ protected:
     };
 
     bool leftP = false, rightP = false;
-    bool pressed[300];
+    bool pressed[300] = {false};
     bool finishAttack;
     int nextAttack, framePerAttack, frameAttack;
     bool facing;

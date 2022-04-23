@@ -4,10 +4,8 @@ game_map::game_map()
 {
     Map_Sheet = NULL;
     background = NULL;
-    Map_X = 300;
-    Map_Y = 20;
-    Num_Block = 4;
-    Num_Bush = 2;
+    flag = NULL;
+    castle = NULL;
     while(Block.size()) Block.pop_back();
     while(Bush.size()) Bush.pop_back();
 }
@@ -15,6 +13,9 @@ game_map::~game_map()
 {
     SDL_FreeSurface(Map_Sheet);
     SDL_DestroyTexture(background);
+    SDL_DestroyTexture(flag);
+    SDL_DestroyTexture(castle);
+
 }
 
 Uint32 getpixel(SDL_Surface *surface, int x, int y)
@@ -68,6 +69,25 @@ int game_map::getNumBush(int _NumBush)
 
 bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
 {
+    std::ifstream file_map((path + "/level_" + int2str(level) + "/map_info.txt").c_str());
+
+    file_map >> Map_Width;
+    file_map >> Map_Height;
+    file_map >> Num_Block;
+    file_map >> Num_Bush;
+    bush_height = new int [Num_Bush];
+    bush_width = new int [Num_Bush];
+    for(int i = 0; i < Num_Bush; i++)
+        file_map >> bush_width[i] >> bush_height[i];
+
+    file_map.close();
+
+    info = new int* [Map_Height];
+
+
+    for(int i = 0; i < Map_Height; i++)
+        info[i] = new int [Map_Width];
+
     Map_Sheet = IMG_Load((path + "/level_" + int2str(level) + "/level.png").c_str());
 
     SDL_Texture* newTexture;
@@ -115,8 +135,8 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
 
     int lp_x;
 
-    for(int i = 0; i < Map_Y; i++)
-        for(int j = 0; j < Map_X; j++)
+    for(int i = 0; i < Map_Height; i++)
+        for(int j = 0; j < Map_Width; j++)
         {
             data = getpixel(Map_Sheet, j, i);
             SDL_GetRGB(data, Map_Sheet->format, &rgb.r, &rgb.g, &rgb.b);
@@ -160,8 +180,8 @@ void game_map::render(SDL_Renderer* ren, int view){
     int numGrass = 0;
 
     rect = {0, 0, TILE_SIZE, TILE_SIZE};
-    for(int i = 0; i < Map_Y; i++)
-        for(int j = 0; j < Map_X; j++)
+    for(int i = 0; i < Map_Height; i++)
+        for(int j = 0; j < Map_Width; j++)
         {
             data = getpixel(Map_Sheet, j, i);
             SDL_GetRGB(data, Map_Sheet->format, &rgb.r, &rgb.g, &rgb.b);
@@ -172,23 +192,28 @@ void game_map::render(SDL_Renderer* ren, int view){
             if(rgb == white){
                 rect.w = TILE_SIZE;
                 rect.h = TILE_SIZE;
-                SDL_RenderCopy(ren, Block[2], NULL, &rect);
+                SDL_RenderCopy(ren, Block[Num_Block - 1], NULL, &rect);
             }
             else if(rgb == green){
                 rect.w = TILE_SIZE;
                 rect.h = TILE_SIZE;
                 numGrass++;
-                SDL_RenderCopy(ren, Block[numGrass%2], NULL, &rect);
+                SDL_RenderCopy(ren, Block[numGrass%(Num_Block - 1)], NULL, &rect);
             }
             else if(rgb == blue){
-                rect.w = 2 * TILE_SIZE;
-                rect.h = 2 * TILE_SIZE;
+                rect.w = bush_width[0] * TILE_SIZE;
+                rect.h = bush_height[0] * TILE_SIZE;
                 SDL_RenderCopy(ren, Bush[0], NULL, &rect);
             }
             else if(rgb == red){
-                rect.w = 4 * TILE_SIZE;
-                rect.h = 4 * TILE_SIZE;
+                rect.w = bush_width[1] * TILE_SIZE;
+                rect.h = bush_width[1] * TILE_SIZE;
                 SDL_RenderCopy(ren, Bush[1], NULL, &rect);
+            }
+            else if(rgb == cyan){
+                rect.w = bush_width[2] * TILE_SIZE;
+                rect.h = bush_height[2] * TILE_SIZE;
+                SDL_RenderCopy(ren, Bush[2], NULL, &rect);
             }
             else if(rgb == yellow){
                 rect.w = 23 * TILE_SIZE;

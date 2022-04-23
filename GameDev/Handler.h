@@ -18,11 +18,11 @@ public:
     ~Handler();
     bool loadLevel(int level, SDL_Renderer* renderer);
     void load(SDL_Renderer* renderer);
-    void tick(SDL_Renderer* renderer, SDL_Event event);
+    void tick(SDL_Renderer* renderer);
     void show(SDL_Renderer* renderer);
     int get_is_running() {return isRunning;}
 
-private:
+protected:
     int view;
     Character _character[numCharacter];
     std::vector<Projectile> vProjectile;
@@ -30,15 +30,18 @@ private:
     std::vector<Item> vItem, vItem_temp;
     std::vector<lp> v_lp;
     std::vector<std::pair<SDL_Rect, int> > rectMob;
+    std::vector<std::pair<SDL_Rect, std::pair<int, int> > > vExplosion;
     SDL_Texture* pr[numProjectile];
     SDL_Texture* itemDrop[numItem];
     SDL_Texture* lpTexture;
     SDL_Texture* lp_Animation[3];
+    SDL_Texture* explosion;
     int pr_w[numProjectile];
     int pr_h[numProjectile];
     game_map* MAP;
     int isRunning, current_level, current_character;
     Screen scr;
+    SDL_Event event;
 
 };
 

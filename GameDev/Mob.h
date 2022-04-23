@@ -23,10 +23,11 @@ public:
     void tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* character);
     void setType(int _type);
     void setWeapon(int _type);
-    int getId();
-    void setId(int _id);
     void setRange(int l, int r);
     void spawnItem(std::vector<Item>& vItem);
+
+    int getId();
+    void setId(int _id);
 
 protected:
     SDL_Texture* idleAnimation[2];
@@ -52,8 +53,10 @@ protected:
     std::pair<int, int> _attack;
     std::pair<int, int> _move;
     int maxX, minX;
-    std::string s[4] = {"sword", "bow", "bomb", "staff"};
+    std::string s[5] = {"sword", "bow", "rifle", "bomb", "staff"};
     int itemDrop[3];
+    int prSpeed;
+    int prRadius;
 };
 
 #endif // MOB_H_

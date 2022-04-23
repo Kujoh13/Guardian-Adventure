@@ -39,7 +39,7 @@ void lp::tick(SDL_Rect character, game_map* MAP, std::vector<Item>& vItem)
 
     if(type == TYPE::GROUND)
     {
-        if(character.x >= MAP->victory && status != STATUS::VICTORY)
+        if(character.x >= MAP->getVictory() && status != STATUS::VICTORY)
         {
             velX = -10;
             if(status != STATUS::MOVE) frame = 0;
@@ -116,7 +116,7 @@ void lp::collisionY(game_map* MAP)
     int pos_y2 = (rect.y + rect.h) / TILE_SIZE;
 
     for(int i = pos_x1; i <= pos_x2; i++)
-        if(MAP->info[pos_y1][i])
+        if(MAP->getInfo()[pos_y1][i])
         {
             rect.y = (pos_y1 + 1) * TILE_SIZE;
             break;
@@ -128,7 +128,7 @@ void lp::collisionY(game_map* MAP)
     pos_y2 = (rect.y + rect.h + 1) / TILE_SIZE;
 
     for(int i = pos_x1; i <= pos_x2; i++)
-        if(MAP->info[pos_y2][i])
+        if(MAP->getInfo()[pos_y2][i])
         {
             rect.y = pos_y2 * TILE_SIZE - rect.h - 1;
             break;

@@ -224,6 +224,20 @@ void Character::show(SDL_Renderer* renderer, int view)
 
     SDL_RenderDrawRect(renderer, &tRect);
 
+    if(type == TYPE::MELEE)
+    {
+        SDL_Rect tempRect = rect;
+        tempRect.x += melee.x;
+        tempRect.y += melee.y;
+        tempRect.w = melee.w;
+        tempRect.h = melee.h;
+
+        if(facing) tempRect.x -= melee.w - charWidth;
+
+        tempRect.x -= view;
+        SDL_RenderDrawRect(renderer, &tempRect);
+    }
+
     if(nStatus != status && (finishAttack || nextAttack == 0)) frame = 0;
 
     if(nStatus == STATUS::DIED)
@@ -253,11 +267,11 @@ void Character::show(SDL_Renderer* renderer, int view)
 
     else if(nStatus == STATUS::IDLE) drawIdle(renderer, view);
     else if(nStatus == STATUS::MOVE) drawMove(renderer, view);
-    //std :: cout << nStatus << '\n';
 }
 
-void Character::handleInput(SDL_Event event)
+bool Character::handleInput(SDL_Event event)
 {
+    bool flag = true;
     if(event.type == SDL_KEYDOWN)
     {
         switch(event.key.keysym.sym)
@@ -278,7 +292,6 @@ void Character::handleInput(SDL_Event event)
             {
                 if(isFalling == false){
                     pressed[' '] = 1;
-
                 }
             }
             break;
@@ -316,9 +329,15 @@ void Character::handleInput(SDL_Event event)
             }
             break;
         }
+
+
     }
-
-
+    if(pressed['a']) flag = false;
+    if(pressed['d']) flag = false;
+    if(pressed[' ']) flag = false;
+    if(pressed['k']) flag = false;
+    if(!flag)
+        return true;
 }
 
 void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rectMob, std::vector<Projectile>& vProjectile)
@@ -342,14 +361,19 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
 
     rect.y += velY;
 
+    if(rect.y < 0) rect.y = 0;
+
+    if(rect.y + rect.h >= MAP->getMapHeight() * TILE_SIZE) rect.y = MAP->getMapHeight() * TILE_SIZE - rect.h;
+
     collisionY(MAP);
 
-    if(rect.y >= MAP->Map_Y * TILE_SIZE || hp == 0)
+    if(rect.y + rect.h >= MAP->getMapHeight() * TILE_SIZE || hp == 0)
     {
         nStatus = STATUS::DIED;
         return;
     }
-    if(rect.x >= MAP->victory)
+
+    if(rect.x >= MAP->getVictory())
     {
         nStatus = STATUS::VICTORY;
         return;
@@ -369,7 +393,7 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
     }
 
     if(rect.x < 0) rect.x = 0;
-    if(rect.x > MAP->Map_X * TILE_SIZE) rect.x = MAP->Map_X * TILE_SIZE;
+    if(rect.x > MAP->getMapWidth() * TILE_SIZE) rect.x = MAP->getMapWidth() * TILE_SIZE;
 
     collisionX(MAP);
 
@@ -380,7 +404,7 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
         nextAttack = 0;
     }
 
-    if(nStatus == STATUS::ATTACK && frame == frameAttack && type == TYPE::MELEE){
+    if(!finishAttack && frame == frameAttack && type == TYPE::MELEE){
 
         SDL_Rect tempRect = rect;
         tempRect.x += melee.x;
@@ -395,6 +419,16 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
                 rectMob[i].second -= dmg;
         }
 
+        if(vProjectile.size())
+        for(int i = vProjectile.size() - 1; i >= 0; i--)
+        {
+            if(collision(tempRect, vProjectile[i].getRect()) && vProjectile[i].getThrew() == false)
+            {
+                std::swap(vProjectile[i], vProjectile.back());
+                vProjectile.pop_back();
+            }
+        }
+
     }
 
     if(nStatus == STATUS::ATTACK && nextAttack == 0 && type == TYPE::RANGED){
@@ -404,7 +438,7 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
         else tRect.x += SCREEN_WIDTH;
         pr.setHostile(false);
         pr.setSpeed(double(prSpeed));
-        pr.shoot(tRect, rect, idProjectile, dmg);
+        pr.shoot(tRect, rect, idProjectile, dmg, prSpeed);
         vProjectile.push_back(pr);
     }
 }
@@ -418,7 +452,7 @@ void Character::collisionX(game_map* MAP)
     int pos_y2 = (rect.y + rect.h) / TILE_SIZE;
 
     for(int i = pos_y1; i <= pos_y2; i++)
-        if(MAP->info[i][pos_x1])
+        if(MAP->getInfo()[i][pos_x1])
         {
             rect.x = (pos_x1 + 1) * TILE_SIZE;
             break;
@@ -430,9 +464,9 @@ void Character::collisionX(game_map* MAP)
     pos_y2 = (rect.y + rect.h) / TILE_SIZE;
 
     for(int i = pos_y1; i <= pos_y2; i++)
-        if(MAP->info[i][pos_x2])
+        if(MAP->getInfo()[i][pos_x2])
         {
-            rect.x = pos_x2 * TILE_SIZE - charWidth - 1;
+            rect.x = pos_x2 * TILE_SIZE - rect.w - 1;
             break;
         }
 
@@ -447,7 +481,7 @@ void Character::collisionY(game_map* MAP)
     int pos_y2 = (rect.y + rect.h) / TILE_SIZE;
 
     for(int i = pos_x1; i <= pos_x2; i++)
-        if(MAP->info[pos_y1][i])
+        if(MAP->getInfo()[pos_y1][i])
         {
             velY = 0;
             rect.y = (pos_y1 + 1) * TILE_SIZE;
@@ -463,11 +497,11 @@ void Character::collisionY(game_map* MAP)
     pos_y2 = (rect.y + rect.h + 1) / TILE_SIZE;
 
     for(int i = pos_x1; i <= pos_x2; i++)
-        if(MAP->info[pos_y2][i])
+        if(MAP->getInfo()[pos_y2][i])
         {
             velY = 0;
             ok = 0;
-            rect.y = pos_y2 * TILE_SIZE - charHeight - 1;
+            rect.y = pos_y2 * TILE_SIZE - rect.h - 1;
             isJumping = isFalling = false;
             break;
         }
