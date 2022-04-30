@@ -25,6 +25,9 @@ public:
     int getHp() {return hp;}
     int getDmg() {return dmg;}
     int getMaxHp() {return maxHp;}
+    int getLevel() {return level;}
+    int getBaseDmg() {return baseDmg;}
+    int getBaseHp() {return baseHp;}
 
     void setX(int x) {rect.x = x;}
     void setY(int y) {rect.y = y;}
@@ -35,6 +38,7 @@ public:
     void setHp(int _hp) {hp = std::max(_hp, 0);}
     void setDmg(int _dmg) {dmg = _dmg;}
     void setMaxHp(int _maxHp) {maxHp = _maxHp;}
+    void setLevel(int _level) {level = _level;}
 
 protected:
     SDL_Texture* pObject;
@@ -42,6 +46,8 @@ protected:
     int velX, velY;
     int hp, dmg;
     int maxHp;
+    int level;
+    int baseHp, baseDmg;
 };
 
 #endif

@@ -16,14 +16,15 @@ static SDL_Renderer* gRenderer = NULL;
 //Screen
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
-const int SCREEN_BPP = 32;
 
 //function
 std::string int2str(int num);
 bool operator == (SDL_Color a, SDL_Color b);
 bool collision(SDL_Rect A, SDL_Rect B);
+bool inRect(int x, int y, SDL_Rect rect);
 double distance(SDL_Rect A, SDL_Rect B);
 long long Rand(long long l, long long r);
+long long getCost(int level);
 
 //Map
 const int TILE_SIZE = 36;
@@ -36,6 +37,8 @@ const SDL_Color white = {255, 255, 255, 255};
 const SDL_Color yellow = {255, 255, 0, 255};
 const SDL_Color pink = {255, 0, 255, 255};
 const SDL_Color cyan = {0, 255, 255, 255};
+const SDL_Color textColor = {245, 220, 189, 255};
+const SDL_Color backColor = {45, 38, 32, 255};
 
 //Character and Mob
 const double gravity = 3;
@@ -49,9 +52,10 @@ const int charWidth = 40;
 const int charHeight = 85;
 const int portraitSize = 100;
 
+const int numLevel = 2;
+
 //Projectiles
 const int numProjectile = 4;
 const double pi = acos(-1);
-
 
 #endif

@@ -66,7 +66,6 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
     else{
         file >> prSpeed;
         if(s[weapon] == "bomb") file >> prRadius;
-        std::cout << s[weapon] <<'\n';
     }
     file >> itemDrop[0];
     file.close();

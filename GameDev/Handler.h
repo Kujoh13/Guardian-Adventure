@@ -42,7 +42,11 @@ protected:
     int isRunning, current_level, current_character;
     Screen scr;
     SDL_Event event;
-
+    int *character_level;
+    int numGem, numCoin;
+    int lastLevel;
+    bool paused;
+    int frame_back;
 };
 
 

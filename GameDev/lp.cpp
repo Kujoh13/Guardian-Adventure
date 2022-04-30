@@ -86,8 +86,6 @@ void lp::show(SDL_Renderer* renderer, int view, SDL_Texture* texture)
         return;
     }
 
-
-
     pii temp;
     if(status == STATUS::IDLE)
         temp = _idle;

@@ -21,6 +21,11 @@ bool collision(SDL_Rect A, SDL_Rect B)
     return !(A.x > B.x + B.w || A.x + A.w < B.x || A.y > B.y + B.h || A.y + A.h < B.y);
 }
 
+bool inRect(int x, int y, SDL_Rect rect)
+{
+    return (rect.x <= x && x < rect.w + rect.x && rect.y <= y && y < rect.y + rect.h);
+}
+
 double distance(SDL_Rect A, SDL_Rect B)
 {
     double x = (2 * A.x + A.w - 2 * B.x - B.w) / 2;
@@ -33,4 +38,9 @@ std::mt19937_64 rng(std::chrono::high_resolution_clock::now().time_since_epoch()
 long long Rand(long long l, long long r)
 {
     return std::uniform_int_distribution<long long> (l, r) (rng);
+}
+
+long long getCost(int level)
+{
+    return 1LL * level * (level + 1) / 2;
 }

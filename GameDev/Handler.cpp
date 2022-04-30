@@ -2,9 +2,9 @@
 
 Handler::Handler()
 {
-    isRunning = 2;
+    isRunning = 1;
     current_character = 0;
-    current_level = 2;
+    current_level = 1;
     for(int i = 0; i < numItem; i++)
         itemDrop[i] = NULL;
 
@@ -19,6 +19,11 @@ Handler::Handler()
     explosion = NULL;
 
     MAP = new game_map;
+
+    numGem = 0, numCoin = 0;
+
+    paused = false;
+    frame_back = 0;
 }
 
 Handler::~Handler()
@@ -48,20 +53,51 @@ void Handler::tick(SDL_Renderer* renderer)
         if(event.type == SDL_QUIT)
         {
             isRunning = 0;
+            std::ofstream player_info("player_info.txt");
+            player_info << numCoin << ' ' << numGem << '\n';
+            player_info << lastLevel << '\n';
+            for(int i = 0; i < numCharacter; i++)
+                player_info << character_level[i] << '\n';
+
+            player_info.close();
         }
-        if(isRunning == 1){
-            if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT){
-                int x, y;
-                SDL_GetMouseState(&x, &y);
-                scr.checkExit(x, y, isRunning, event);
-                scr.checkStart(x, y, isRunning, event);
+        int prev = isRunning;
+        if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT){
+            int x, y;
+            SDL_GetMouseState(&x, &y);
+            scr.handleMouseInput(x, y, isRunning, current_level, current_character, character_level, numCoin, numGem, lastLevel, paused);
+            if(prev == 2 && isRunning == 3)
+            {
+                _character[current_character].setX(0);
+                _character[current_character].setY(0);
+                vMob.clear();
+                rectMob.clear();
+                vItem.clear();
+                vItem_temp.clear();
+                vProjectile.clear();
+                vExplosion.clear();
+                v_lp.clear();
+                _character[current_character].setLevel(character_level[current_character]);
+
+                int newDmg = _character[current_character].getBaseDmg() ;
+                if(character_level[current_character] > 0)
+                    newDmg += character_level[current_character] - 1;
+                _character[current_character].setDmg(newDmg);
+
+                int newHp = _character[current_character].getBaseHp();
+                if(character_level[current_character] > 0)
+                    newHp += (character_level[current_character] - 1) * 2;
+                _character[current_character].setMaxHp(newHp);
+
+                _character[current_character].setHp(_character[current_character].getMaxHp());
+                loadLevel(current_level, renderer);
             }
         }
-        else if(isRunning == 2){
-            loadLevel(current_level, renderer);
-            isRunning = 3;
+        else if(event.type == SDL_KEYDOWN)
+        {
+            scr.handleKeyInput(event, paused, isRunning);
         }
-        else if(isRunning == 3){
+        if(isRunning == 3){
             if(_character[current_character].handleInput(event))
                 idle = false;
         }
@@ -79,12 +115,28 @@ void Handler::tick(SDL_Renderer* renderer)
     if(isRunning == 1){
         scr.startScreen(renderer);
     }
+    else if(isRunning == 2){
+        int baseHp = _character[current_character].getBaseHp();
+        int baseDmg = _character[current_character].getBaseDmg();
+        scr.levelSelection(renderer, current_level, current_character, character_level, numCoin, numGem, lastLevel, baseHp, baseDmg);
+    }
     else if(isRunning == 3){
+        if(paused) return;
 
         for(int i = 0; i < vMob.size(); i++)
             rectMob.push_back({vMob[i].getRect(), vMob[i].getHp()});
 
         _character[current_character].tick(MAP, rectMob, vProjectile);
+
+        if(_character[current_character].getStatus() == 4 || _character[current_character].getStatus() == 5)
+        {
+            frame_back++;
+            if(frame_back == 5 * 30){
+                isRunning = 2;
+                if(_character[current_character].getStatus() == 5)
+                    lastLevel++;
+            }
+        }
 
         if(vItem.size())
         for(int i = vItem.size() - 1; i >= 0; i--)
@@ -99,6 +151,9 @@ void Handler::tick(SDL_Renderer* renderer)
                     int nHp = std::min(_character[current_character].getMaxHp(), _character[current_character].getHp() + vItem[i].getVal());
                     _character[current_character].setHp(nHp);
                 }
+                else if(vItem[i].getId() == 1)
+                    numGem += vItem[i].getVal();
+                else numCoin += vItem[i].getVal();
                 std::swap(vItem[i], vItem.back());
                 vItem.pop_back();
             }
@@ -200,99 +255,108 @@ void Handler::tick(SDL_Renderer* renderer)
 
 void Handler::show(SDL_Renderer* renderer)
 {
-    if(_character[current_character].getX() >= SCREEN_WIDTH / 2)
-        view = _character[current_character].getX() - (SCREEN_WIDTH / 2);
-    else view = 0;
+    if(isRunning == 3){
+        if(_character[current_character].getX() >= SCREEN_WIDTH / 2)
+            view = _character[current_character].getX() - (SCREEN_WIDTH / 2);
+        else view = 0;
 
-    MAP->render(renderer, view);
+        MAP->render(renderer, view);
 
-    for(int i = 0; i < vItem.size(); i++){
-        SDL_Rect nRect = vItem[i].getRect();
-        nRect.x -= view;
-        SDL_RenderCopy(renderer, itemDrop[vItem[i].getId()], NULL, &nRect);
-    }
-
-    for(int i = 0; i < vMob.size(); i++){
-        vMob[i].show(renderer, view);
-
-        /// h / mh = x / 40 x = h * 40
-
-        SDL_Rect tRect = {vMob[i].getX() - view, vMob[i].getY() - 5, 42, 7};
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
-        SDL_RenderFillRect(renderer, &tRect);
-
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
-        int w = vMob[i].getHp() * 40 / vMob[i].getMaxHp();
-
-        tRect = {vMob[i].getX() + 1 - view, vMob[i].getY() - 4, w, 5};
-
-        SDL_RenderFillRect(renderer, &tRect);
-
-    }
-
-    scr.ingame(renderer, _character[current_character].getHp(), _character[current_character].getDmg());
-
-    _character[current_character].show(renderer, view);
-    if(_character[current_character].getStatus() != 5){
-
-        SDL_Rect rect = {_character[current_character].getX() - view, _character[current_character].getY() - 5, 42, 7};
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
-        SDL_RenderFillRect(renderer, &rect);
-
-        int w = _character[current_character].getHp() * 40 / _character[current_character].getMaxHp();
-
-        rect = {_character[current_character].getX() + 1 - view, _character[current_character].getY() - 4, w, 5};
-
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-
-        SDL_RenderFillRect(renderer, &rect);
-
-    }
-
-    for(int i = 0; i < vProjectile.size(); i++){
-
-        vProjectile[i].setW(pr_w[vProjectile[i].getId()]);
-        vProjectile[i].setH(pr_h[vProjectile[i].getId()]);
-
-        SDL_Rect tRect = vProjectile[i].getRect();
-        tRect.x -= view;
-
-        SDL_RenderDrawRect(renderer, &tRect);
-
-        SDL_RenderCopyEx(renderer, pr[vProjectile[i].getId()], NULL, &tRect, vProjectile[i].getAngle(), NULL, SDL_FLIP_NONE);
-    }
-
-    for(int i = 0; i < v_lp.size(); i++)
-    {
-        if(v_lp[i].getType() == 1)
-            v_lp[i].show(renderer, view, lp_Animation[v_lp[i].getStatus()]);
-        else
-            v_lp[i].show(renderer, view, lpTexture);
-    }
-    if(vExplosion.size())
-    for(int i = vExplosion.size() - 1; i >= 0; i--){
-        SDL_Rect tRect = vExplosion[i].first;
-        int r = vExplosion[i].second.first;
-        tRect.x = (2 * vExplosion[i].first.x + vExplosion[i].first.w) / 2 - sqrt(2) / 2 * r - view;
-        tRect.y = (2 * vExplosion[i].first.y + vExplosion[i].first.h) / 2 - sqrt(2) / 2 * r;
-        tRect.w = sqrt(2) * r;
-        tRect.h = sqrt(2) * r;
-        SDL_RenderCopy(renderer, explosion, NULL, &tRect);
-        vExplosion[i].second.second--;
-        if(vExplosion[i].second.second == 0)
-        {
-            std::swap(vExplosion[i], vExplosion.back());
-            vExplosion.pop_back();
+        for(int i = 0; i < vItem.size(); i++){
+            SDL_Rect nRect = vItem[i].getRect();
+            nRect.x -= view;
+            SDL_RenderCopy(renderer, itemDrop[vItem[i].getId()], NULL, &nRect);
         }
+
+        for(int i = 0; i < vMob.size(); i++){
+            vMob[i].show(renderer, view);
+
+            /// h / mh = x / 40 x = h * 40
+
+            SDL_Rect tRect = {vMob[i].getX() - view, vMob[i].getY() - 5, 42, 7};
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+            SDL_RenderFillRect(renderer, &tRect);
+
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+            int w = vMob[i].getHp() * 40 / vMob[i].getMaxHp();
+
+            tRect = {vMob[i].getX() + 1 - view, vMob[i].getY() - 4, w, 5};
+
+            SDL_RenderFillRect(renderer, &tRect);
+
+            tRect.y -= 5;
+
+        }
+
+        int level_end = 0;
+        if (_character[current_character].getStatus() == 4) level_end = 1;
+        else if(_character[current_character].getStatus() == 5) level_end = 2;
+        scr.ingame(renderer, _character[current_character].getHp(), _character[current_character].getDmg(), numCoin, numGem, paused, level_end);
+
+        _character[current_character].show(renderer, view);
+        if(_character[current_character].getStatus() != 5){
+
+            SDL_Rect rect = {_character[current_character].getX() - view, _character[current_character].getY() - 5, 42, 7};
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+            SDL_RenderFillRect(renderer, &rect);
+
+            int w = _character[current_character].getHp() * 40 / _character[current_character].getMaxHp();
+
+            rect = {_character[current_character].getX() + 1 - view, _character[current_character].getY() - 4, w, 5};
+
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+
+            SDL_RenderFillRect(renderer, &rect);
+
+        }
+
+
+        for(int i = 0; i < vProjectile.size(); i++){
+
+            vProjectile[i].setW(pr_w[vProjectile[i].getId()]);
+            vProjectile[i].setH(pr_h[vProjectile[i].getId()]);
+
+            SDL_Rect tRect = vProjectile[i].getRect();
+            tRect.x -= view;
+
+            SDL_RenderDrawRect(renderer, &tRect);
+
+            SDL_RenderCopyEx(renderer, pr[vProjectile[i].getId()], NULL, &tRect, vProjectile[i].getAngle(), NULL, SDL_FLIP_NONE);
+        }
+
+        for(int i = 0; i < v_lp.size(); i++)
+        {
+            if(v_lp[i].getType() == 1)
+                v_lp[i].show(renderer, view, lp_Animation[v_lp[i].getStatus()]);
+            else
+                v_lp[i].show(renderer, view, lpTexture);
+        }
+
+        if(vExplosion.size())
+        for(int i = vExplosion.size() - 1; i >= 0; i--){
+            SDL_Rect tRect = vExplosion[i].first;
+            int r = vExplosion[i].second.first;
+            tRect.x = (2 * vExplosion[i].first.x + vExplosion[i].first.w) / 2 - sqrt(2) / 2 * r - view;
+            tRect.y = (2 * vExplosion[i].first.y + vExplosion[i].first.h) / 2 - sqrt(2) / 2 * r;
+            tRect.w = sqrt(2) * r;
+            tRect.h = sqrt(2) * r;
+            SDL_RenderCopy(renderer, explosion, NULL, &tRect);
+            vExplosion[i].second.second--;
+            if(vExplosion[i].second.second == 0)
+            {
+                std::swap(vExplosion[i], vExplosion.back());
+                vExplosion.pop_back();
+            }
+        }
+
+
     }
-
     SDL_RenderPresent(renderer);
-
 }
 
 bool Handler::loadLevel(int level, SDL_Renderer* renderer)
@@ -358,6 +422,16 @@ bool Handler::loadLevel(int level, SDL_Renderer* renderer)
 
 void Handler::load(SDL_Renderer* renderer)
 {
+    character_level = new int[numCharacter];
+    std::ifstream player_info("player_info.txt");
+    player_info >> numCoin >> numGem;
+    player_info >> lastLevel;
+    for(int i = 0; i < numCharacter; i++){
+        player_info >> character_level[i];
+    }
+
+    player_info.close();
+
     scr.loadTexture(renderer);
 
     //////////////

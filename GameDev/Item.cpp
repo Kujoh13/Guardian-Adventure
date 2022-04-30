@@ -18,6 +18,11 @@ void Item::tick(SDL_Rect character, game_map* MAP)
         if(velY > 15)
             velY = 15;
         rect.y += velY;
+        if(rect.y >= SCREEN_HEIGHT || rect.y <= 0)
+        {
+            fell = true;
+            return;
+        }
         collisionY(MAP);
 
         rect.x += velX;
