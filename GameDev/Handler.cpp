@@ -24,6 +24,9 @@ Handler::Handler()
 
     paused = false;
     frame_back = 0;
+    frame_char3 = 1000;
+
+    id = 0;
 }
 
 Handler::~Handler()
@@ -90,6 +93,7 @@ void Handler::tick(SDL_Renderer* renderer)
                 _character[current_character].setMaxHp(newHp);
 
                 _character[current_character].setHp(_character[current_character].getMaxHp());
+                frame_back = 0;
                 loadLevel(current_level, renderer);
             }
         }
@@ -126,14 +130,23 @@ void Handler::tick(SDL_Renderer* renderer)
         for(int i = 0; i < vMob.size(); i++)
             rectMob.push_back({vMob[i].getRect(), vMob[i].getHp()});
 
+        frame_char3++;
+
+        if(frame_char3 <= 3 * 30)
+            _character[current_character].setVelX(MAX_RUN_SPEED + 10);
+        else
+            _character[current_character].setVelX(MAX_RUN_SPEED);
+
         _character[current_character].tick(MAP, rectMob, vProjectile);
+
+        _character[current_character].setObjectId(++id, 0);
 
         if(_character[current_character].getStatus() == 4 || _character[current_character].getStatus() == 5)
         {
             frame_back++;
             if(frame_back == 5 * 30){
                 isRunning = 2;
-                if(_character[current_character].getStatus() == 5)
+                if(_character[current_character].getStatus() == 5 && lastLevel == current_level)
                     lastLevel++;
             }
         }
@@ -142,6 +155,9 @@ void Handler::tick(SDL_Renderer* renderer)
         for(int i = vItem.size() - 1; i >= 0; i--)
         {
             vItem[i].tick(_character[current_character].getRect(), MAP);
+
+            vItem[i].setObjectId(++id, 0);
+
             if(collision(vItem[i].getRect(), _character[current_character].getRect()) && vItem[i].getFell())
             {
                 if(vItem[i].getId() == 3)
@@ -179,6 +195,7 @@ void Handler::tick(SDL_Renderer* renderer)
         for(int i = vMob.size() - 1; i >= 0; i--)
         {
             vMob[i].setHp(rectMob[i].second);
+            vMob[i].setObjectId(++id, 0);
             if(rectMob[i].second == 0)
             {
                vMob[i].spawnItem(vItem);
@@ -191,47 +208,63 @@ void Handler::tick(SDL_Renderer* renderer)
                 vMob[i].tick(MAP, vProjectile, &_character[current_character]);
         }
         if(vProjectile.size())
-        for(int i = vProjectile.size() - 1; i >= 0 ; i--)
         {
-            vProjectile[i].tick(MAP);
-            if(vProjectile[i].done())
+            if(current_character == 1)
+                character1();
+            else
             {
-                if(distance(vProjectile[i].getHitBox(), _character[current_character].getRect()) <= vProjectile[i].getRadius())
+                for(int i = vProjectile.size() - 1; i >= 0; i--)
                 {
-                    int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
-                    _character[current_character].setHp(curHp);
-                }
-                vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
-                std::swap(vProjectile[i], vProjectile.back());
-                vProjectile.pop_back();
-            }
-            else if(vProjectile[i].getHostile())
-            {
-                if(collision(vProjectile[i].getHitBox(), _character[current_character].getRect()))
-                {
-                    int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
-                    _character[current_character].setHp(curHp);
-                    if(vProjectile[i].getThrew())
+                    vProjectile[i].tick(MAP);
+                    vProjectile[i].setObjectId(++id, 0);
+                    if(vProjectile[i].done())
                     {
-                        vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
-                    }
-                    std::swap(vProjectile[i], vProjectile.back());
-                    vProjectile.pop_back();
-                }
-            }
-            else if(!vProjectile[i].getHostile())
-            {
-                if(vMob.size())
-                for(int j = vMob.size() - 1; j >= 0; j--)
-                {
-
-                    if(collision(rectMob[j].first, vProjectile[i].getHitBox()))
-                    {
-                        rectMob[j].second = std::max(0, rectMob[j].second - vProjectile[i].getDmg());
-                        vMob[j].setHp(rectMob[j].second);
+                        if(vProjectile[i].getThrew()){
+                            if(distance(vProjectile[i].getHitBox(), _character[current_character].getRect()) <= vProjectile[i].getRadius())
+                            {
+                                int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
+                                _character[current_character].setHp(curHp);
+                            }
+                            vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
+                        }
                         std::swap(vProjectile[i], vProjectile.back());
                         vProjectile.pop_back();
-                        break;
+                    }
+                    else if(vProjectile[i].getHostile())
+                    {
+                        if(collision(vProjectile[i].getHitBox(), _character[current_character].getRect()))
+                        {
+                            int chance = Rand(1, 4);
+                            if(current_character != 2 || chance >= 2)
+                            {
+                                int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
+                                _character[current_character].setHp(curHp);
+                            }
+                            if(vProjectile[i].getThrew())
+                            {
+                                vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
+                            }
+                            std::swap(vProjectile[i], vProjectile.back());
+                            vProjectile.pop_back();
+                        }
+                    }
+                    else if(!vProjectile[i].getHostile())
+                    {
+                        if(vMob.size())
+                        for(int j = vMob.size() - 1; j >= 0; j--)
+                        {
+
+                            if(collision(rectMob[j].first, vProjectile[i].getHitBox()))
+                            {
+                                if(current_character == 3)
+                                    frame_char3 = 0;
+                                rectMob[j].second = std::max(0, rectMob[j].second - vProjectile[i].getDmg());
+                                vMob[j].setHp(rectMob[j].second);
+                                std::swap(vProjectile[i], vProjectile.back());
+                                vProjectile.pop_back();
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -287,7 +320,26 @@ void Handler::show(SDL_Renderer* renderer)
 
             SDL_RenderFillRect(renderer, &tRect);
 
-            tRect.y -= 5;
+            tRect.x--;
+            tRect.y += 6;
+            tRect.h = 7;
+            tRect.w = 42;
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderFillRect(renderer, &tRect);
+
+            std::pair<int, int> temp = vMob[i].getAttackBar();
+            temp.first = std::min(temp.first, temp.second);
+
+            tRect.x++;
+            tRect.y++;
+            tRect.h = 5;
+            tRect.w = temp.first * 40 / temp.second;
+
+            SDL_SetRenderDrawColor(renderer, 107, 107, 107, 255);
+            if(temp.first == temp.second)
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderFillRect(renderer, &tRect);
 
         }
 
@@ -297,9 +349,14 @@ void Handler::show(SDL_Renderer* renderer)
         scr.ingame(renderer, _character[current_character].getHp(), _character[current_character].getDmg(), numCoin, numGem, paused, level_end);
 
         _character[current_character].show(renderer, view);
-        if(_character[current_character].getStatus() != 5){
+        {
+            SDL_Rect cRect = _character[current_character].getRect();
 
-            SDL_Rect rect = {_character[current_character].getX() - view, _character[current_character].getY() - 5, 42, 7};
+            cRect.x -= view;
+
+            SDL_RenderDrawRect(renderer, &cRect);
+
+            SDL_Rect rect = {_character[current_character].getX() - view, _character[current_character].getY() - 20, 42, 7};
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
@@ -307,10 +364,31 @@ void Handler::show(SDL_Renderer* renderer)
 
             int w = _character[current_character].getHp() * 40 / _character[current_character].getMaxHp();
 
-            rect = {_character[current_character].getX() + 1 - view, _character[current_character].getY() - 4, w, 5};
+            rect = {_character[current_character].getX() + 1 - view, _character[current_character].getY() - 19, w, 5};
 
             SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 
+            SDL_RenderFillRect(renderer, &rect);
+
+            rect.x--;
+            rect.y += 6;
+            rect.h = 7;
+            rect.w = 42;
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderFillRect(renderer, &rect);
+
+            std::pair<int, int> temp = _character[current_character].getAttackBar();
+            temp.first = std::min(temp.first, temp.second);
+
+            rect.x++;
+            rect.y++;
+            rect.h = 5;
+            rect.w = temp.first * 40 / temp.second;
+
+            SDL_SetRenderDrawColor(renderer, 107, 107, 107, 255);
+            if(temp.first == temp.second)
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
             SDL_RenderFillRect(renderer, &rect);
 
         }
@@ -500,4 +578,54 @@ void Handler::load(SDL_Renderer* renderer)
     SDL_FreeSurface(loadSurface);
 
     ///////////////
+}
+
+void Handler::character1()
+{
+    for(int i = vProjectile.size() - 1; i >= 0; i--)
+    {
+        vProjectile[i].tick(MAP);
+        vProjectile[i].setObjectId(++id, 0);
+        if(vProjectile[i].done())
+        {
+            if(vProjectile[i].getThrew()){
+                if(distance(vProjectile[i].getHitBox(), _character[current_character].getRect()) <= vProjectile[i].getRadius())
+                {
+                    int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
+                    _character[current_character].setHp(curHp);
+                }
+                vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
+            }
+            std::swap(vProjectile[i], vProjectile.back());
+            vProjectile.pop_back();
+        }
+        else if(vProjectile[i].getHostile())
+        {
+            if(collision(vProjectile[i].getHitBox(), _character[current_character].getRect()))
+            {
+                int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
+                _character[current_character].setHp(curHp);
+                if(vProjectile[i].getThrew())
+                {
+                    vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
+                }
+                std::swap(vProjectile[i], vProjectile.back());
+                vProjectile.pop_back();
+            }
+        }
+        else if(!vProjectile[i].getHostile())
+        {
+            if(vMob.size())
+            for(int j = vMob.size() - 1; j >= 0; j--)
+            {
+
+                if(collision(rectMob[j].first, vProjectile[i].getHitBox()) && vMob[j].getObjectId() != vProjectile[i].getObjectId())
+                {
+                    vMob[j].setObjectId(vProjectile[i].getObjectId(), 1);
+                    rectMob[j].second = std::max(0, rectMob[j].second - vProjectile[i].getDmg());
+                    vMob[j].setHp(rectMob[j].second);
+                }
+            }
+        }
+    }
 }

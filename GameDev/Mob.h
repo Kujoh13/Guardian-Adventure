@@ -29,6 +29,8 @@ public:
     int getId();
     void setId(int _id);
 
+    std::pair<int, int> getAttackBar();
+
 protected:
     SDL_Texture* idleAnimation[2];
     SDL_Texture* attackAnimation[2];

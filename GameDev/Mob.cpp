@@ -213,7 +213,7 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
     rect.y += MAX_FALL_SPEED;
     collisionY(MAP);
 
-    if(nextAttack == 0 && type == TYPE::RANGED)
+    if(nextAttack == 0 && type == TYPE::RANGED && abs(rect.x - character->getX()) <= SCREEN_WIDTH)
     {
         Projectile temp;
         if(s[weapon] == "bomb") temp.setThrew(true);
@@ -234,7 +234,10 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
         if(facing) tempRect.x -= melee.w - charWidth;
 
         if(collision(tempRect, character->getRect())){
+            int chance = Rand(1, 4);
             character->setHp(character->getHp() - dmg);
+            if(chance == 1 && character->getId() == 2)
+                hp = std::max(0, hp - dmg);
         }
     }
 }
@@ -314,6 +317,11 @@ void Mob::collisionY(game_map* MAP)
             rect.y = pos_y2 * TILE_SIZE - rect.h - 1;
             break;
         }
+}
+
+std::pair<int, int> Mob::getAttackBar()
+{
+    return {nextAttack, framePerAttack};
 }
 
 void Mob::setType(int _type)

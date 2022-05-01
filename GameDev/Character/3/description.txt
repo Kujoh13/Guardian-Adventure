@@ -1,0 +1,4 @@
+Divine Beast Mayreel
+- Ranged attack increases 
+movement speed on hit for
+3 seconds.

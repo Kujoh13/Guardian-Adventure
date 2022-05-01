@@ -26,6 +26,7 @@ Character::Character()
         diedAnimation[i] = NULL;
         attackAnimation[i] = NULL;
     }
+    velX = MAX_RUN_SPEED;
 }
 
 Character::~Character()
@@ -112,7 +113,7 @@ bool Character::loadCharacter(std::string path, SDL_Renderer* renderer, int _id)
             file >> frameAttack;
         }
         else{
-            file >> idProjectile >> prSpeed;
+            file >> idProjectile >> prSpeed >> prLastTime;
         }
         file.close();
     }
@@ -383,13 +384,13 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
     {
         facing = 1;
         nStatus = STATUS::MOVE;
-        rect.x -= MAX_RUN_SPEED;
+        rect.x -= velX;
     }
     else if(pressed['d'])
     {
         nStatus = STATUS::MOVE;
         facing = 0;
-        rect.x += MAX_RUN_SPEED;
+        rect.x += velX;
     }
 
     if(rect.x < 0) rect.x = 0;
@@ -415,8 +416,15 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
         if(facing) tempRect.x -= melee.w - charWidth;
 
         for(int i = 0; i < rectMob.size(); i++){
-            if(collision(tempRect, rectMob[i].first))
+            if(collision(tempRect, rectMob[i].first)){
                 rectMob[i].second -= dmg;
+                if(id == 0)
+                {
+                    int chance = Rand(1, 5);
+                    if(chance == 1)
+                        rectMob[i].second -= dmg / 2;
+                }
+            }
         }
 
         if(vProjectile.size())
@@ -438,6 +446,7 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
         else tRect.x += SCREEN_WIDTH;
         pr.setHostile(false);
         pr.setSpeed(double(prSpeed));
+        pr.setLastTime(prLastTime);
         pr.shoot(tRect, rect, idProjectile, dmg, prSpeed);
         vProjectile.push_back(pr);
     }
@@ -508,6 +517,10 @@ void Character::collisionY(game_map* MAP)
 
     if(ok) isFalling = true;
 
+}
+std::pair<int, int> Character::getAttackBar()
+{
+    return {nextAttack, framePerAttack};
 }
 
 void Character::setStatus(int _status)

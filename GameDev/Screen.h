@@ -50,6 +50,7 @@ protected:
     TTF_Font* font;
     TTF_Font* textFont;
     TTF_Font* textFontBig;
+    TTF_Font* textFontSmall;
     SDL_Rect rectBar[2];
     int curAlpha;
     int itemCount[3];
@@ -63,7 +64,7 @@ protected:
     int cw, ch;
     int ptSize;
     int prev;
-
+    std::vector<std::string> description;
     long long *cost;
 };
 

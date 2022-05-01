@@ -25,6 +25,8 @@ public:
     void setStatus(int _status);
     int getStatus();
     bool getAttack();
+    int getId() {return id;}
+    std::pair<int, int> getAttackBar();
 
 protected:
     SDL_Texture* idleAnimation[2];
@@ -71,7 +73,7 @@ protected:
     int nextAttack, framePerAttack, frameAttack;
     bool facing;
     int type;
-    int idProjectile, prSpeed;
+    int idProjectile, prSpeed, prLastTime;
 
     enum TYPE{
         RANGED = 0,

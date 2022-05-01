@@ -28,6 +28,9 @@ public:
     void setThrew(bool _threw) {threw = _threw;}
     bool getThrew() {return threw;}
 
+    void setLastTime(int _lastTime) {lastTime = _lastTime;}
+
+
 protected:
     double angle;
     double speed;

@@ -10,6 +10,7 @@ GameObject::GameObject()
     velX = velY = 0;
     hp = dmg = 0;
     level = 1;
+    objectId = 0;
 }
 
 GameObject::~GameObject()

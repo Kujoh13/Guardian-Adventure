@@ -21,6 +21,7 @@ public:
     void tick(SDL_Renderer* renderer);
     void show(SDL_Renderer* renderer);
     int get_is_running() {return isRunning;}
+    void character1();
 
 protected:
     int view;
@@ -47,6 +48,8 @@ protected:
     int lastLevel;
     bool paused;
     int frame_back;
+    int frame_char3;
+    int id;
 };
 
 

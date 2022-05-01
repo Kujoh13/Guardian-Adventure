@@ -28,6 +28,7 @@ public:
     int getLevel() {return level;}
     int getBaseDmg() {return baseDmg;}
     int getBaseHp() {return baseHp;}
+    int getObjectId() {return objectId;}
 
     void setX(int x) {rect.x = x;}
     void setY(int y) {rect.y = y;}
@@ -39,6 +40,7 @@ public:
     void setDmg(int _dmg) {dmg = _dmg;}
     void setMaxHp(int _maxHp) {maxHp = _maxHp;}
     void setLevel(int _level) {level = _level;}
+    void setObjectId(int _objectId, bool ok) {if(objectId == 0 || ok) objectId = _objectId;}
 
 protected:
     SDL_Texture* pObject;
@@ -48,6 +50,7 @@ protected:
     int maxHp;
     int level;
     int baseHp, baseDmg;
+    int objectId;
 };
 
 #endif

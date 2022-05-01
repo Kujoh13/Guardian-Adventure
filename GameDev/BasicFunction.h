@@ -45,7 +45,7 @@ const double gravity = 3;
 const double MAX_FALL_SPEED = 25;
 const double MAX_RUN_SPEED = 15;
 
-const int numCharacter = 2;
+const int numCharacter = 4;
 const int numItem = 4;
 const int charSize = 300;
 const int charWidth = 40;
@@ -55,7 +55,7 @@ const int portraitSize = 100;
 const int numLevel = 2;
 
 //Projectiles
-const int numProjectile = 4;
+const int numProjectile = 5;
 const double pi = acos(-1);
 
 #endif

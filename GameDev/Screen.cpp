@@ -99,6 +99,8 @@ void Screen::loadTexture(SDL_Renderer* renderer)
 
     textFontBig = TTF_OpenFont("calibrib.ttf", 35);
 
+    textFontSmall = TTF_OpenFont("calibrib.ttf", 20);
+
     start_screen_title0.setX(120);
     start_screen_title0.setY(-200);
     start_screen_title1.setX(15);
@@ -231,7 +233,6 @@ void Screen::startScreen(SDL_Renderer* renderer)
 
 void Screen::handleMouseInput(int x, int y, int &isRunning, int &cur_level, int &cur_character, int* character_level, int &numCoin, int &numGem, int lastLevel, bool &paused)
 {
-    std::cout << prev << '\n';
     if(isRunning == 1)
     {
         if(curAlpha == 255)
@@ -438,6 +439,7 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
 
     ///load Character
     if(change_character){ /// load Character in Level Selection
+        description.clear();
         frame = 0;
         std::string path = "Character/" + int2str(cur_character);
         SDL_Surface* sf = IMG_Load((path + "/idle0.png").c_str());
@@ -448,6 +450,14 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
         file >> fr.first;
         file >> fr.first >> fr.second;
         file.close();
+
+        std::ifstream file_description((path + "/description.txt").c_str());
+        std::string s;
+        while(std::getline(file_description, s))
+            description.push_back(s);
+
+        file_description.close();
+
         SDL_FreeSurface(sf);
     }
     SDL_Rect fRect = {0, 0, charSize, charSize};
@@ -483,7 +493,7 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
         tRect.h += 8;
         SDL_SetRenderDrawColor(renderer, 120, 120, 0, 255);
         SDL_RenderFillRect(renderer, &tRect);
-        SDL_RenderDrawRect(renderer, &tRect);
+
         SDL_RenderCopy(renderer, level_background, NULL, &nRect);
 
         nRect.x = nRect.x + nRect.w - 40;
@@ -598,7 +608,7 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
             tt = SDL_CreateTextureFromSurface(renderer, sf);
             dmgRect.w = sf->w;
             dmgRect.h = sf->h;
-            dmgRect.x = 50 + infoBox.getX() + infoBox.getW() / 2;
+            dmgRect.x = 60 + infoBox.getX() + infoBox.getW() / 2;
             dmgRect.y -= 5;
             SDL_RenderCopy(renderer, tt, NULL, &dmgRect);
         }
@@ -617,7 +627,7 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
             tt = SDL_CreateTextureFromSurface(renderer, sf);
             hpRect.w = sf->w;
             hpRect.h = sf->h;
-            hpRect.x = 50 + infoBox.getX() + infoBox.getW() / 2;
+            hpRect.x = 60 + infoBox.getX() + infoBox.getW() / 2;
             hpRect.y -= 5;
             SDL_RenderCopy(renderer, tt, NULL, &hpRect);
         }
@@ -636,7 +646,7 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
             tt = SDL_CreateTextureFromSurface(renderer, sf);
             lvRect.w = sf->w;
             lvRect.h = sf->h;
-            lvRect.x = 50 + infoBox.getX() + infoBox.getW() / 2;
+            lvRect.x = 60 + infoBox.getX() + infoBox.getW() / 2;
             lvRect.y -= 5;
             SDL_RenderCopy(renderer, tt, NULL, &lvRect);
         }
@@ -645,16 +655,36 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
         {
             SDL_Rect aRect = {0, 0, 25, 23};
 
-            aRect.x = dmgIconStat.getX() + 120;
+            aRect.x = dmgIconStat.getX() + 150;
             aRect.y = dmgIconStat.getY() + (hpIconStat.getH() - aRect.h) / 2;
             SDL_RenderCopy(renderer, statArrow, NULL, &aRect);
 
-            aRect.x = hpIconStat.getX() + 120;
+            aRect.x = hpIconStat.getX() + 150;
             aRect.y = hpIconStat.getY() + (hpIconStat.getH() - aRect.h) / 2;
             SDL_RenderCopy(renderer, statArrow, NULL, &aRect);
 
             aRect.y -= 20 + aRect.h;
             SDL_RenderCopy(renderer, statArrow, NULL, &aRect);
+        }
+
+
+        ///Draw Description
+
+        SDL_Rect dRect;
+        dRect.x = infoBox.getX() + 10;
+        dRect.y = infoBox.getY() + charSize - 170;
+
+        for(int i = 0; i < description.size(); i++)
+        {
+            sf = TTF_RenderText_Solid(textFontSmall, description[i].c_str(), textColor);
+            tt = SDL_CreateTextureFromSurface(renderer, sf);
+
+            dRect.w = sf->w;
+            dRect.h = sf->h;
+
+            SDL_RenderCopy(renderer, tt, NULL, &dRect);
+
+            dRect.y += 25;
         }
 
         ///draw Cost
