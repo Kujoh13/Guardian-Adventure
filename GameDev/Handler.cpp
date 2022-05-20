@@ -2,7 +2,7 @@
 
 Handler::Handler()
 {
-    isRunning = 1;
+    isRunning = prev = 1;
     current_character = 0;
     current_level = 1;
     for(int i = 0; i < numItem; i++)
@@ -27,6 +27,8 @@ Handler::Handler()
     frame_char3 = 1000;
 
     id = 0;
+
+    prev_char_level = NULL;
 }
 
 Handler::~Handler()
@@ -51,6 +53,10 @@ Handler::~Handler()
 void Handler::tick(SDL_Renderer* renderer)
 {
     bool idle = true;
+    prev_map = current_level;
+    prev_char = current_character;
+    for(int i = 0; i < numCharacter; i++)
+        prev_char_level[i] = character_level[i];
     while(SDL_PollEvent(&event))
     {
         if(event.type == SDL_QUIT)
@@ -64,13 +70,40 @@ void Handler::tick(SDL_Renderer* renderer)
 
             player_info.close();
         }
-        int prev = isRunning;
+        prev = isRunning;
         if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT){
+
             int x, y;
             SDL_GetMouseState(&x, &y);
             scr.handleMouseInput(x, y, isRunning, current_level, current_character, character_level, numCoin, numGem, lastLevel, paused);
+
+            bool click = true;
+
+            if(current_level != prev_map)
+            {
+                Audio_Player.changeMap();
+                click = false;
+            }
+
+            if(prev_char != current_character)
+            {
+                Audio_Player.selectCharacter();
+                click = false;
+            }
+
+            if(prev_char_level[current_character] != character_level[current_character])
+            {
+                if(prev_char_level[current_character]) Audio_Player.upgradeCharacter();
+                else Audio_Player.unlockCharacter();
+                click = false;
+            }
+
+
+
             if(prev == 2 && isRunning == 3)
             {
+                Audio_Player.playButton();
+                click = false;
                 _character[current_character].setX(0);
                 _character[current_character].setY(0);
                 vMob.clear();
@@ -93,9 +126,14 @@ void Handler::tick(SDL_Renderer* renderer)
                 _character[current_character].setMaxHp(newHp);
 
                 _character[current_character].setHp(_character[current_character].getMaxHp());
+                _character[current_character].setStatus(0);
+                _character[current_character].setFrame(0);
                 frame_back = 0;
+                delete(MAP);
+                MAP = new game_map;
                 loadLevel(current_level, renderer);
             }
+            if(click) Audio_Player.mouse_click();
         }
         else if(event.type == SDL_KEYDOWN)
         {
@@ -116,13 +154,17 @@ void Handler::tick(SDL_Renderer* renderer)
 
     SDL_RenderClear(renderer);
 
+    if(prev != isRunning) Audio_Player.stopAudio();
+
     if(isRunning == 1){
         scr.startScreen(renderer);
+        Audio_Player.playBackgroundMusic(isRunning, current_level);
     }
     else if(isRunning == 2){
         int baseHp = _character[current_character].getBaseHp();
         int baseDmg = _character[current_character].getBaseDmg();
         scr.levelSelection(renderer, current_level, current_character, character_level, numCoin, numGem, lastLevel, baseHp, baseDmg);
+        Audio_Player.playBackgroundMusic(isRunning, current_level);
     }
     else if(isRunning == 3){
         if(paused) return;
@@ -139,16 +181,32 @@ void Handler::tick(SDL_Renderer* renderer)
 
         _character[current_character].tick(MAP, rectMob, vProjectile);
 
+        if(_character[current_character].startAttack() && _character[current_character].getStatus() == 3)
+            Audio_Player.character_attack(current_character);
+
         _character[current_character].setObjectId(++id, 0);
 
         if(_character[current_character].getStatus() == 4 || _character[current_character].getStatus() == 5)
         {
+            if(frame_back == 0)
+            {
+                Audio_Player.stopAudio();
+                if(_character[current_character].getStatus() == 4)
+                    Audio_Player.loseGame();
+                else
+                    Audio_Player.winGame();
+            }
             frame_back++;
             if(frame_back == 5 * 30){
                 isRunning = 2;
                 if(_character[current_character].getStatus() == 5 && lastLevel == current_level)
                     lastLevel++;
+                _character[current_character].setStatus(0);
             }
+        }
+        else
+        {
+            Audio_Player.playBackgroundMusic(isRunning, current_level);
         }
 
         if(vItem.size())
@@ -161,15 +219,25 @@ void Handler::tick(SDL_Renderer* renderer)
             if(collision(vItem[i].getRect(), _character[current_character].getRect()) && vItem[i].getFell())
             {
                 if(vItem[i].getId() == 3)
-                    vItem[i].dropItem(vItem_temp, Rand(1, MAP->numCoin), Rand(1, MAP->numGem));
+                    vItem[i].dropItem(vItem_temp, Rand(1, MAP->getNumCoin()), Rand(1, MAP->getNumGem()), _character[current_character].getMaxHp());
                 else if(vItem[i].getId() == 2)
                 {
-                    int nHp = std::min(_character[current_character].getMaxHp(), _character[current_character].getHp() + vItem[i].getVal());
-                    _character[current_character].setHp(nHp);
+                    if(_character[current_character].getStatus() < 4){
+                        int nHp = std::min(_character[current_character].getMaxHp(), _character[current_character].getHp() + vItem[i].getVal());
+                        _character[current_character].setHp(nHp);
+                        Audio_Player.character_heal();
+                    }
                 }
                 else if(vItem[i].getId() == 1)
+                {
                     numGem += vItem[i].getVal();
-                else numCoin += vItem[i].getVal();
+                    Audio_Player.collectItem();
+                }
+                else
+                {
+                    numCoin += vItem[i].getVal();
+                    Audio_Player.collectItem();
+                }
                 std::swap(vItem[i], vItem.back());
                 vItem.pop_back();
             }
@@ -198,6 +266,7 @@ void Handler::tick(SDL_Renderer* renderer)
             vMob[i].setObjectId(++id, 0);
             if(rectMob[i].second == 0)
             {
+               Audio_Player.mobDie();
                vMob[i].spawnItem(vItem);
                std::swap(rectMob[i], rectMob.back());
                std::swap(vMob[i], vMob.back());
@@ -226,6 +295,7 @@ void Handler::tick(SDL_Renderer* renderer)
                                 _character[current_character].setHp(curHp);
                             }
                             vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
+                            Audio_Player.bomb_explosion();
                         }
                         std::swap(vProjectile[i], vProjectile.back());
                         vProjectile.pop_back();
@@ -293,7 +363,7 @@ void Handler::show(SDL_Renderer* renderer)
             view = _character[current_character].getX() - (SCREEN_WIDTH / 2);
         else view = 0;
 
-        MAP->render(renderer, view);
+        MAP->render(renderer, view, vMob.empty());
 
         for(int i = 0; i < vItem.size(); i++){
             SDL_Rect nRect = vItem[i].getRect();
@@ -501,6 +571,7 @@ bool Handler::loadLevel(int level, SDL_Renderer* renderer)
 void Handler::load(SDL_Renderer* renderer)
 {
     character_level = new int[numCharacter];
+    prev_char_level = new int[numCharacter];
     std::ifstream player_info("player_info.txt");
     player_info >> numCoin >> numGem;
     player_info >> lastLevel;
@@ -574,6 +645,8 @@ void Handler::load(SDL_Renderer* renderer)
         loadSurface = IMG_Load(path.c_str());
         lp_Animation[i] = SDL_CreateTextureFromSurface(renderer, loadSurface);
     }
+
+    Audio_Player.loadAudioFiles();
 
     SDL_FreeSurface(loadSurface);
 

@@ -20,6 +20,7 @@ void close()
     IMG_Quit();
     SDL_Quit();
     TTF_Quit();
+    Mix_Quit();
 }
 
 int main(int argc, char* argv[]){
@@ -69,6 +70,9 @@ void initSDL(SDL_Window* &window, SDL_Renderer* &renderer){
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+        printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
 }
 
 void logSDLError(std::ostream& os,

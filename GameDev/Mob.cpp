@@ -8,7 +8,7 @@ Mob::Mob()
         moveAnimation[i] = NULL;
     }
     move = attack = idle = false;
-    facing = 1;
+    facing = direction = 1;
     frame = 0;
     type = 1;
     maxX = minX = 0;
@@ -58,14 +58,13 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
     maxHp = hp;
     file >> type;
     file >> velX;
-    file >> weapon;
     if(type == TYPE::MELEE){
         file >> melee.x >> melee.y >> melee.w >> melee.h;
         file >> frameAttack;
     }
     else{
         file >> prSpeed;
-        if(s[weapon] == "bomb") file >> prRadius;
+        if(type == TYPE::THROW) file >> prRadius;
     }
     file >> itemDrop[0];
     file.close();
@@ -77,7 +76,7 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
 
         std::string st = int2str(i) + ".png";
 
-        loadedSurface = IMG_Load((path + "/idle_" + s[weapon] + st).c_str());
+        loadedSurface = IMG_Load((path + "/idle" + st).c_str());
 
         if(loadedSurface != NULL){
             idle = true;
@@ -85,7 +84,7 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
         }
         else std::cout << SDL_GetError() << '\n';
 
-        loadedSurface = IMG_Load((path + "/move_" + s[weapon] + st).c_str());
+        loadedSurface = IMG_Load((path + "/move" + st).c_str());
 
         if(loadedSurface != NULL){
             move = true;
@@ -93,7 +92,7 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
         }
         else std::cout << SDL_GetError() << '\n';
 
-        loadedSurface = IMG_Load((path + "/attack_" + s[weapon] + st).c_str());
+        loadedSurface = IMG_Load((path + "/attack" + st).c_str());
 
         if(loadedSurface != NULL){
             attack = true;
@@ -189,23 +188,30 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
 {
     if(move)
     {
-        if(facing) rect.x -= velX;
+        if(direction) rect.x -= velX;
         else rect.x += velX;
     }
-    if(idle)
+    if(type == TYPE::RANGED || type == TYPE::THROW)
     {
         if(rect.x >= character->getX()) facing = 1;
         else facing = 0;
     }
-    if(rect.x > maxX)
+    else
     {
-        rect.x = maxX;
-        facing = 1;
+        facing = direction;
     }
-    else if(rect.x < minX)
-    {
-        rect.x = minX;
-        facing = 0;
+
+    if(move){
+        if(rect.x > maxX - rect.w)
+        {
+            rect.x = maxX - rect.w;
+            direction = 1;
+        }
+        else if(rect.x < minX)
+        {
+            rect.x = minX;
+            direction = 0;
+        }
     }
 
     collisionX(MAP);
@@ -213,11 +219,19 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
     rect.y += MAX_FALL_SPEED;
     collisionY(MAP);
 
-    if(nextAttack == 0 && type == TYPE::RANGED && abs(rect.x - character->getX()) <= SCREEN_WIDTH)
+    if(nextAttack == 0 && type == TYPE::RANGED && abs(rect.x - character->getX()) <= SCREEN_WIDTH / 2)
     {
         Projectile temp;
-        if(s[weapon] == "bomb") temp.setThrew(true);
-        if(s[weapon] == "bomb") temp.setRadius(prRadius);
+        temp.shoot(character->getRect(), rect, idProjectile, dmg, prSpeed);
+        temp.setHostile(true);
+        vProjectile.push_back(temp);
+    }
+
+    if(nextAttack == 0 && type == TYPE::THROW && abs(rect.x - character->getX()) <= SCREEN_WIDTH / 2)
+    {
+        Projectile temp;
+        temp.setThrew(true);
+        temp.setRadius(prRadius);
         temp.shoot(character->getRect(), rect, idProjectile, dmg, prSpeed);
         temp.setHostile(true);
         vProjectile.push_back(temp);

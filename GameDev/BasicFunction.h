@@ -52,10 +52,10 @@ const int charWidth = 40;
 const int charHeight = 85;
 const int portraitSize = 100;
 
-const int numLevel = 2;
+const int numLevel = 3;
 
 //Projectiles
-const int numProjectile = 5;
+const int numProjectile = 6;
 const double pi = acos(-1);
 
 #endif

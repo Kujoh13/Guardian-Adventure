@@ -10,7 +10,7 @@ public:
     game_map();
     ~game_map();
     bool loadMap(std::string path, SDL_Renderer* renderer, int level);
-    void render(SDL_Renderer* ren, int view);
+    void render(SDL_Renderer* renderer, int view, bool map_cleared);
     void setNumBlock(int _NumBlock);
     int getNumBlock(int _NumBlock);
     void setNumBush(int _NumBush);
@@ -23,12 +23,11 @@ public:
     int getNumGem() {return numGem;}
 
     int **getInfo() {return info;}
-    int getVictory() {return victory;}
+    int getVictory() {return victory_w;}
     int getMapWidth() {return Map_Width;}
     int getMapHeight() {return Map_Height;}
     std::vector<int> get_lp_pos() {return lp_pos;}
     void pop() {lp_pos.pop_back();}
-    int numCoin, numGem;
 
 protected:
     std::vector<SDL_Texture*> Block;
@@ -41,10 +40,11 @@ protected:
     int Num_Bush;
     std::vector<int> lp_pos;
     int Map_Width, Map_Height;
-    int victory;
+    int victory_w, victory_h;
     int** info;
     int* bush_width;
     int* bush_height;
+    int numCoin, numGem;
 };
 
 Uint32 getpixel(SDL_Surface *surface, int x, int y);

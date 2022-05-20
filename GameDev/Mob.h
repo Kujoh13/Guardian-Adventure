@@ -43,6 +43,8 @@ protected:
     enum TYPE{
         RANGED = 0,
         MELEE = 1,
+        THROW = 2,
+        LASER = 3,
     };
     int weapon;
     bool idle, move, attack;
@@ -50,12 +52,11 @@ protected:
     int nextAttack;
     int framePerAttack;
     int mobId;
-    bool facing;
+    bool facing, direction;
     std::pair<int, int> _idle;
     std::pair<int, int> _attack;
     std::pair<int, int> _move;
     int maxX, minX;
-    std::string s[5] = {"sword", "bow", "rifle", "bomb", "staff"};
     int itemDrop[3];
     int prSpeed;
     int prRadius;

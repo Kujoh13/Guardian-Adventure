@@ -608,7 +608,7 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
             tt = SDL_CreateTextureFromSurface(renderer, sf);
             dmgRect.w = sf->w;
             dmgRect.h = sf->h;
-            dmgRect.x = 60 + infoBox.getX() + infoBox.getW() / 2;
+            dmgRect.x = 40 + infoBox.getX() + infoBox.getW() / 2;
             dmgRect.y -= 5;
             SDL_RenderCopy(renderer, tt, NULL, &dmgRect);
         }
@@ -627,7 +627,7 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
             tt = SDL_CreateTextureFromSurface(renderer, sf);
             hpRect.w = sf->w;
             hpRect.h = sf->h;
-            hpRect.x = 60 + infoBox.getX() + infoBox.getW() / 2;
+            hpRect.x = 40 + infoBox.getX() + infoBox.getW() / 2;
             hpRect.y -= 5;
             SDL_RenderCopy(renderer, tt, NULL, &hpRect);
         }
@@ -646,7 +646,7 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
             tt = SDL_CreateTextureFromSurface(renderer, sf);
             lvRect.w = sf->w;
             lvRect.h = sf->h;
-            lvRect.x = 60 + infoBox.getX() + infoBox.getW() / 2;
+            lvRect.x = 40 + infoBox.getX() + infoBox.getW() / 2;
             lvRect.y -= 5;
             SDL_RenderCopy(renderer, tt, NULL, &lvRect);
         }
@@ -655,11 +655,11 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
         {
             SDL_Rect aRect = {0, 0, 25, 23};
 
-            aRect.x = dmgIconStat.getX() + 150;
+            aRect.x = dmgIconStat.getX() + 130;
             aRect.y = dmgIconStat.getY() + (hpIconStat.getH() - aRect.h) / 2;
             SDL_RenderCopy(renderer, statArrow, NULL, &aRect);
 
-            aRect.x = hpIconStat.getX() + 150;
+            aRect.x = hpIconStat.getX() + 130;
             aRect.y = hpIconStat.getY() + (hpIconStat.getH() - aRect.h) / 2;
             SDL_RenderCopy(renderer, statArrow, NULL, &aRect);
 

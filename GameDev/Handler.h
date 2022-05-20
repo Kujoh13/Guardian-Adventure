@@ -10,6 +10,7 @@
 #include "Mob.h"
 #include "Projectile.h"
 #include "lp.h"
+#include "AudioPlayer.h"
 
 class Handler
 {
@@ -50,6 +51,9 @@ protected:
     int frame_back;
     int frame_char3;
     int id;
+    int prev, prev_map, prev_char;
+    int *prev_char_level;
+    AudioPlayer Audio_Player;
 };
 
 

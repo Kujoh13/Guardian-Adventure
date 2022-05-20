@@ -18,7 +18,7 @@ void Item::tick(SDL_Rect character, game_map* MAP)
         if(velY > 15)
             velY = 15;
         rect.y += velY;
-        if(rect.y >= SCREEN_HEIGHT || rect.y <= 0)
+        if(rect.y + rect.w >= SCREEN_HEIGHT - 1 || rect.y <= 0)
         {
             fell = true;
             return;
@@ -41,7 +41,7 @@ void Item::tick(SDL_Rect character, game_map* MAP)
     }
 }
 
-void Item::dropItem(std::vector<Item>& vItem, int numCoin, int numGem)
+void Item::dropItem(std::vector<Item>& vItem, int numCoin, int numGem, int char_hp)
 {
     for(int i = 0; i < std::min(numCoin, 10); i++)
     {
@@ -85,7 +85,7 @@ void Item::dropItem(std::vector<Item>& vItem, int numCoin, int numGem)
         nItem.setW(30);
         nItem.setH(30);
         nItem.setId(ID::HEART);
-        nItem.setVal(1);
+        nItem.setVal(std::max(1, char_hp / 5));
         vItem.push_back(nItem);
     }
 }

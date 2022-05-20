@@ -2,34 +2,9 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="BasicFunction.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="8" zoom_2="0">
+	<File name="GameObject.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="10" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1078" topLine="23" />
-		</Cursor>
-	</File>
-	<File name="Mob.cpp" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6589" topLine="215" />
-		</Cursor>
-	</File>
-	<File name="main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="812" topLine="18" />
-		</Cursor>
-	</File>
-	<File name="lp.h" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="10" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="834" topLine="9" />
-		</Cursor>
-	</File>
-	<File name="Mob.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="8" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1350" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Character.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="12" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="975" topLine="11" />
+			<Cursor1 position="219" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="lp.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
@@ -37,64 +12,9 @@
 			<Cursor1 position="688" topLine="86" />
 		</Cursor>
 	</File>
-	<File name="Item.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="10" zoom_2="0">
+	<File name="Handler.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="666" topLine="16" />
-		</Cursor>
-	</File>
-	<File name="game_map.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="5" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3608" topLine="179" />
-		</Cursor>
-	</File>
-	<File name="game_map.h" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="9" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1263" topLine="3" />
-		</Cursor>
-	</File>
-	<File name="Screen.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="6" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1811" topLine="23" />
-		</Cursor>
-	</File>
-	<File name="GameObject.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="10" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="200" topLine="12" />
-		</Cursor>
-	</File>
-	<File name="Handler.cpp" open="1" top="1" tabpos="6" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="8408" topLine="205" />
-		</Cursor>
-	</File>
-	<File name="Screen.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="23044" topLine="659" />
-		</Cursor>
-	</File>
-	<File name="Projectile.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="9" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="122" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Handler.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="11" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="249" topLine="4" />
-		</Cursor>
-	</File>
-	<File name="GameObject.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="10" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1432" topLine="4" />
-		</Cursor>
-	</File>
-	<File name="Character.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="6" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="10541" topLine="92" />
-		</Cursor>
-	</File>
-	<File name="Projectile.cpp" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="7" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2583" topLine="63" />
+			<Cursor1 position="4755" topLine="231" />
 		</Cursor>
 	</File>
 	<File name="Item.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="7" zoom_2="0">
@@ -102,9 +22,99 @@
 			<Cursor1 position="340" topLine="12" />
 		</Cursor>
 	</File>
+	<File name="AudioPlayer.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="6" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="418" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="AudioPlayer.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2744" topLine="88" />
+		</Cursor>
+	</File>
+	<File name="Character.cpp" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="6" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="10131" topLine="354" />
+		</Cursor>
+	</File>
+	<File name="Item.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="10" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="666" topLine="16" />
+		</Cursor>
+	</File>
+	<File name="main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1773" topLine="36" />
+		</Cursor>
+	</File>
+	<File name="Projectile.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="9" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="836" topLine="12" />
+		</Cursor>
+	</File>
+	<File name="lp.h" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="10" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="834" topLine="9" />
+		</Cursor>
+	</File>
+	<File name="Character.h" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="12" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="949" topLine="12" />
+		</Cursor>
+	</File>
+	<File name="game_map.cpp" open="1" top="1" tabpos="10" split="0" active="1" splitpos="0" zoom_1="5" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2058" topLine="98" />
+		</Cursor>
+	</File>
+	<File name="Screen.cpp" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="20410" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Mob.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="8" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1400" topLine="7" />
+		</Cursor>
+	</File>
+	<File name="Screen.h" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="6" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1811" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="GameObject.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="10" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1386" topLine="7" />
+		</Cursor>
+	</File>
+	<File name="Mob.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5461" topLine="42" />
+		</Cursor>
+	</File>
+	<File name="BasicFunction.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="8" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="30" topLine="24" />
+		</Cursor>
+	</File>
+	<File name="Handler.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="11" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="205" topLine="12" />
+		</Cursor>
+	</File>
+	<File name="Projectile.cpp" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="7" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="127" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="game_map.h" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="9" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1231" topLine="3" />
+		</Cursor>
+	</File>
 	<File name="BasicFunction.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="11" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1305" topLine="39" />
+			<Cursor1 position="1516" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

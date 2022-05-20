@@ -8,13 +8,32 @@ game_map::game_map()
     castle = NULL;
     while(Block.size()) Block.pop_back();
     while(Bush.size()) Bush.pop_back();
+
+    info = NULL;
+    bush_width = NULL;
+    bush_height = NULL;
 }
 game_map::~game_map()
 {
     SDL_FreeSurface(Map_Sheet);
+    Map_Sheet = NULL;
+
     SDL_DestroyTexture(background);
+    background = NULL;
+
     SDL_DestroyTexture(flag);
+    flag = NULL;
+
     SDL_DestroyTexture(castle);
+    castle = NULL;
+
+    delete(bush_height);
+    delete(bush_width);
+    delete(info);
+
+    bush_height = NULL;
+    bush_width = NULL;
+    info = NULL;
 
 }
 
@@ -78,12 +97,13 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
     bush_height = new int [Num_Bush];
     bush_width = new int [Num_Bush];
     for(int i = 0; i < Num_Bush; i++)
+    {
         file_map >> bush_width[i] >> bush_height[i];
+    }
 
     file_map.close();
 
     info = new int* [Map_Height];
-
 
     for(int i = 0; i < Map_Height; i++)
         info[i] = new int [Map_Width];
@@ -146,7 +166,11 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
             {
                 info[i][j] = 0;
                 if(rgb == yellow) lp_x = j * TILE_SIZE + 11 * TILE_SIZE;
-                if(rgb == pink) victory = j * TILE_SIZE;
+                if(rgb == pink)
+                {
+                    victory_w = j * TILE_SIZE;
+                    victory_h = (i + 4) * TILE_SIZE;
+                }
             }
         }
 
@@ -168,18 +192,33 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
     return Map_Sheet != NULL && background != NULL;
 }
 
-void game_map::render(SDL_Renderer* ren, int view){
+void game_map::render(SDL_Renderer* renderer, int view, bool map_cleared){
 
     SDL_Rect rect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
-    SDL_RenderCopy(ren, background, NULL, &rect);
+    SDL_RenderCopy(renderer, background, NULL, &rect);
 
     SDL_Color rgb;
     Uint32 data;
 
+    rect = {0, 0, TILE_SIZE, TILE_SIZE};
+
     int numGrass = 0;
 
-    rect = {0, 0, TILE_SIZE, TILE_SIZE};
+    if(map_cleared == false)
+        for(int i = 0; i <= victory_h / TILE_SIZE; i++)
+        {
+            info[i][victory_w / TILE_SIZE - 1] = 1;
+            rect.x = victory_w - TILE_SIZE - view;
+            rect.y = i * TILE_SIZE;
+            SDL_RenderCopy(renderer, Block[Num_Block - 1], NULL, &rect);
+        }
+    else
+        for(int i = 0; i <= victory_h / TILE_SIZE; i++)
+        {
+            info[i][victory_w / TILE_SIZE - 1] = 0;
+        }
+
     for(int i = 0; i < Map_Height; i++)
         for(int j = 0; j < Map_Width; j++)
         {
@@ -192,39 +231,39 @@ void game_map::render(SDL_Renderer* ren, int view){
             if(rgb == white){
                 rect.w = TILE_SIZE;
                 rect.h = TILE_SIZE;
-                SDL_RenderCopy(ren, Block[Num_Block - 1], NULL, &rect);
+                SDL_RenderCopy(renderer, Block[Num_Block - 1], NULL, &rect);
             }
             else if(rgb == green){
                 rect.w = TILE_SIZE;
                 rect.h = TILE_SIZE;
                 numGrass++;
-                SDL_RenderCopy(ren, Block[numGrass%(Num_Block - 1)], NULL, &rect);
+                SDL_RenderCopy(renderer, Block[numGrass%(Num_Block - 1)], NULL, &rect);
             }
             else if(rgb == blue){
                 rect.w = bush_width[0] * TILE_SIZE;
                 rect.h = bush_height[0] * TILE_SIZE;
-                SDL_RenderCopy(ren, Bush[0], NULL, &rect);
+                SDL_RenderCopy(renderer, Bush[0], NULL, &rect);
             }
             else if(rgb == red){
                 rect.w = bush_width[1] * TILE_SIZE;
-                rect.h = bush_width[1] * TILE_SIZE;
-                SDL_RenderCopy(ren, Bush[1], NULL, &rect);
+                rect.h = bush_height[1] * TILE_SIZE;
+                SDL_RenderCopy(renderer, Bush[1], NULL, &rect);
             }
             else if(rgb == cyan){
                 rect.w = bush_width[2] * TILE_SIZE;
                 rect.h = bush_height[2] * TILE_SIZE;
-                SDL_RenderCopy(ren, Bush[2], NULL, &rect);
+                SDL_RenderCopy(renderer, Bush[2], NULL, &rect);
             }
             else if(rgb == yellow){
                 rect.w = 23 * TILE_SIZE;
                 rect.h = 18 * TILE_SIZE;
 
-                SDL_RenderCopy(ren, castle, NULL, &rect);
+                SDL_RenderCopy(renderer, castle, NULL, &rect);
             }
             else if(rgb == pink){
                 rect.w = 2 * TILE_SIZE;
                 rect.h = 5 * TILE_SIZE;
-                SDL_RenderCopy(ren, flag, NULL, &rect);
+                SDL_RenderCopy(renderer, flag, NULL, &rect);
             }
         }
 }

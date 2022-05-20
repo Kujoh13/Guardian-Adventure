@@ -5,7 +5,7 @@ Projectile::Projectile()
     angle = 0;
     threw = false;
     curTime = 0;
-    lastTime = 50;
+    lastTime = 100;
     hostile = false;
     radius = 0;
 }

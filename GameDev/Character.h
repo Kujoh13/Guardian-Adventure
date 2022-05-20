@@ -23,10 +23,12 @@ public:
     void drawDied(SDL_Renderer* renderer, int view);
     void drawVictory(SDL_Renderer* renderer, int view);
     void setStatus(int _status);
+    void setFrame(int _frame) {frame = _frame;}
     int getStatus();
     bool getAttack();
     int getId() {return id;}
     std::pair<int, int> getAttackBar();
+    bool startAttack() {return nextAttack == 0;}
 
 protected:
     SDL_Texture* idleAnimation[2];

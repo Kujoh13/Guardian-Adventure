@@ -364,11 +364,11 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
 
     if(rect.y < 0) rect.y = 0;
 
-    if(rect.y + rect.h >= MAP->getMapHeight() * TILE_SIZE) rect.y = MAP->getMapHeight() * TILE_SIZE - rect.h;
+    if(rect.y + rect.h >= MAP->getMapHeight() * TILE_SIZE - 2) rect.y = MAP->getMapHeight() * TILE_SIZE - rect.h - 2;
 
     collisionY(MAP);
 
-    if(rect.y + rect.h >= MAP->getMapHeight() * TILE_SIZE || hp == 0)
+    if(rect.y + rect.h >= MAP->getMapHeight() * TILE_SIZE - 2 || hp == 0)
     {
         nStatus = STATUS::DIED;
         return;

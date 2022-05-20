@@ -1,0 +1,6 @@
+- Press A or D to move left or right
+- Press SPACE to jump
+- Press K to attack
+- Press P to pause the game
+- Press ESC to return
+- Defeat all enemies to unlock next level
