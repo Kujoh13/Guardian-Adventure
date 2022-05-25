@@ -35,9 +35,16 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-O3" />
 			<Add option="-Wall" />
+			<Add option="-std=gnu++14" />
 			<Add option="-fexceptions" />
+			<Add directory="SDL2-2.0.20/x86_64-w64-mingw32/include/SDL2" />
 		</Compiler>
+		<Linker>
+			<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer" />
+			<Add directory="SDL2-2.0.20/x86_64-w64-mingw32/lib" />
+		</Linker>
 		<Unit filename="AudioPlayer.cpp" />
 		<Unit filename="AudioPlayer.h" />
 		<Unit filename="BasicFunction.cpp" />
