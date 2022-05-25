@@ -29,6 +29,9 @@ Handler::Handler()
     id = 0;
 
     prev_char_level = NULL;
+
+    char_growth = NULL;
+
 }
 
 Handler::~Handler()
@@ -48,15 +51,18 @@ Handler::~Handler()
         SDL_DestroyTexture(lp_Animation[i]);
 
     SDL_DestroyTexture(explosion);
+
+    delete(char_growth);
+
 }
 
 void Handler::tick(SDL_Renderer* renderer)
 {
-    bool idle = true;
     prev_map = current_level;
     prev_char = current_character;
     for(int i = 0; i < numCharacter; i++)
         prev_char_level[i] = character_level[i];
+    prev = isRunning;
     while(SDL_PollEvent(&event))
     {
         if(event.type == SDL_QUIT)
@@ -66,11 +72,10 @@ void Handler::tick(SDL_Renderer* renderer)
             player_info << numCoin << ' ' << numGem << '\n';
             player_info << lastLevel << '\n';
             for(int i = 0; i < numCharacter; i++)
-                player_info << character_level[i] << '\n';
+                player_info << character_level[i] << ' ' << char_growth[i][0] << ' ' << char_growth[i][1] << '\n';
 
             player_info.close();
         }
-        prev = isRunning;
         if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT){
 
             int x, y;
@@ -117,12 +122,12 @@ void Handler::tick(SDL_Renderer* renderer)
 
                 int newDmg = _character[current_character].getBaseDmg() ;
                 if(character_level[current_character] > 0)
-                    newDmg += character_level[current_character] - 1;
+                    newDmg += (character_level[current_character] - 1) * char_growth[current_character][0];
                 _character[current_character].setDmg(newDmg);
 
                 int newHp = _character[current_character].getBaseHp();
                 if(character_level[current_character] > 0)
-                    newHp += (character_level[current_character] - 1) * 2;
+                    newHp += (character_level[current_character] - 1) * char_growth[current_character][1];
                 _character[current_character].setMaxHp(newHp);
 
                 _character[current_character].setHp(_character[current_character].getMaxHp());
@@ -131,6 +136,7 @@ void Handler::tick(SDL_Renderer* renderer)
                 frame_back = 0;
                 delete(MAP);
                 MAP = new game_map;
+                boss.reset();
                 loadLevel(current_level, renderer);
             }
             if(click) Audio_Player.mouse_click();
@@ -140,17 +146,10 @@ void Handler::tick(SDL_Renderer* renderer)
             scr.handleKeyInput(event, paused, isRunning);
         }
         if(isRunning == 3){
-            if(_character[current_character].handleInput(event))
-                idle = false;
+            _character[current_character].handleInput(event);
         }
 
     }
-
-    if(idle)
-        _character[current_character].setStatus(0);
-
-    if(!_character[current_character].getAttack())
-        _character[current_character].setStatus(3);
 
     SDL_RenderClear(renderer);
 
@@ -163,7 +162,7 @@ void Handler::tick(SDL_Renderer* renderer)
     else if(isRunning == 2){
         int baseHp = _character[current_character].getBaseHp();
         int baseDmg = _character[current_character].getBaseDmg();
-        scr.levelSelection(renderer, current_level, current_character, character_level, numCoin, numGem, lastLevel, baseHp, baseDmg);
+        scr.levelSelection(renderer, current_level, current_character, character_level, numCoin, numGem, lastLevel, baseHp, baseDmg, char_growth);
         Audio_Player.playBackgroundMusic(isRunning, current_level);
     }
     else if(isRunning == 3){
@@ -179,7 +178,23 @@ void Handler::tick(SDL_Renderer* renderer)
         else
             _character[current_character].setVelX(MAX_RUN_SPEED);
 
+//        if(_character[current_character].jumped())
+//            Audio_Player.character_jump();
+
+        if(_character[current_character].getMove() && _character[current_character].getStatus() < 4 && _character[current_character].onGround())
+        {
+            if(current_character == 1 || current_character == 2)
+                Audio_Player.character_move(1);
+            else
+                Audio_Player.character_move(0);
+        }
+        else Audio_Player.setMove();
+
+        if(current_level == numLevel)
+            boss.tick(&_character[current_character], vItem);
+
         _character[current_character].tick(MAP, rectMob, vProjectile);
+
 
         if(_character[current_character].startAttack() && _character[current_character].getStatus() == 3)
             Audio_Player.character_attack(current_character);
@@ -202,6 +217,7 @@ void Handler::tick(SDL_Renderer* renderer)
                 if(_character[current_character].getStatus() == 5 && lastLevel == current_level)
                     lastLevel++;
                 _character[current_character].setStatus(0);
+                Audio_Player.stopAudio();
             }
         }
         else
@@ -238,6 +254,11 @@ void Handler::tick(SDL_Renderer* renderer)
                     numCoin += vItem[i].getVal();
                     Audio_Player.collectItem();
                 }
+                std::swap(vItem[i], vItem.back());
+                vItem.pop_back();
+            }
+            else if(vItem[i].getY() + vItem[i].getH() >= SCREEN_HEIGHT - 1)
+            {
                 std::swap(vItem[i], vItem.back());
                 vItem.pop_back();
             }
@@ -304,8 +325,8 @@ void Handler::tick(SDL_Renderer* renderer)
                     {
                         if(collision(vProjectile[i].getHitBox(), _character[current_character].getRect()))
                         {
-                            int chance = Rand(1, 4);
-                            if(current_character != 2 || chance >= 2)
+                            int chance = Rand(1, 2);
+                            if(current_character != 2 || chance == 1)
                             {
                                 int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
                                 _character[current_character].setHp(curHp);
@@ -320,14 +341,45 @@ void Handler::tick(SDL_Renderer* renderer)
                     }
                     else if(!vProjectile[i].getHostile())
                     {
+                        if(current_level == numLevel)
+                        {
+                            if(collision(vProjectile[i].getHitBox(), boss.getBossHitbox()) && boss.vulnerable())
+                            {
+                                if(current_character == 3)
+                                    frame_char3 = 0;
+                                if(current_character == 4)
+                                {
+                                    int chance = Rand(1, 4);
+                                    if(chance == 3)
+                                    {
+                                        int newHp = _character[current_character].getHp() + _character[current_character].getMaxHp() / 10;
+                                        _character[current_character].setHp(newHp);
+                                        Audio_Player.character_heal();
+                                    }
+                                }
+                                boss.takeDamage(vProjectile[i].getDmg());
+                                std::swap(vProjectile[i], vProjectile.back());
+                                vProjectile.pop_back();
+                            }
+                        }
                         if(vMob.size())
                         for(int j = vMob.size() - 1; j >= 0; j--)
                         {
 
-                            if(collision(rectMob[j].first, vProjectile[i].getHitBox()))
+                            if(collision(rectMob[j].first, vProjectile[i].getRect()))
                             {
                                 if(current_character == 3)
                                     frame_char3 = 0;
+                                if(current_character == 4)
+                                {
+                                    int chance = Rand(1, 4);
+                                    if(chance == 3)
+                                    {
+                                        int newHp = _character[current_character].getHp() + _character[current_character].getMaxHp() / 10;
+                                        _character[current_character].setHp(newHp);
+                                        Audio_Player.character_heal();
+                                    }
+                                }
                                 rectMob[j].second = std::max(0, rectMob[j].second - vProjectile[i].getDmg());
                                 vMob[j].setHp(rectMob[j].second);
                                 std::swap(vProjectile[i], vProjectile.back());
@@ -359,11 +411,15 @@ void Handler::tick(SDL_Renderer* renderer)
 void Handler::show(SDL_Renderer* renderer)
 {
     if(isRunning == 3){
+
         if(_character[current_character].getX() >= SCREEN_WIDTH / 2)
             view = _character[current_character].getX() - (SCREEN_WIDTH / 2);
         else view = 0;
+        if(current_level == numLevel) view = 0;
 
-        MAP->render(renderer, view, vMob.empty());
+        MAP->render(renderer, view, vMob.empty(), current_character == numLevel);
+
+
 
         for(int i = 0; i < vItem.size(); i++){
             SDL_Rect nRect = vItem[i].getRect();
@@ -419,6 +475,10 @@ void Handler::show(SDL_Renderer* renderer)
         scr.ingame(renderer, _character[current_character].getHp(), _character[current_character].getDmg(), numCoin, numGem, paused, level_end);
 
         _character[current_character].show(renderer, view);
+
+        if(current_level == numLevel)
+            boss.show(renderer, &Audio_Player);
+
         {
             SDL_Rect cRect = _character[current_character].getRect();
 
@@ -572,11 +632,16 @@ void Handler::load(SDL_Renderer* renderer)
 {
     character_level = new int[numCharacter];
     prev_char_level = new int[numCharacter];
+
+    char_growth = new int* [numCharacter];
+    for(int i = 0; i < numCharacter; i++)
+        char_growth[i] = new int [2];
+
     std::ifstream player_info("player_info.txt");
     player_info >> numCoin >> numGem;
     player_info >> lastLevel;
     for(int i = 0; i < numCharacter; i++){
-        player_info >> character_level[i];
+        player_info >> character_level[i] >> char_growth[i][0] >> char_growth[i][1];
     }
 
     player_info.close();
@@ -648,6 +713,8 @@ void Handler::load(SDL_Renderer* renderer)
 
     Audio_Player.loadAudioFiles();
 
+    boss.loadBoss(renderer);
+
     SDL_FreeSurface(loadSurface);
 
     ///////////////
@@ -697,6 +764,13 @@ void Handler::character1()
                     vMob[j].setObjectId(vProjectile[i].getObjectId(), 1);
                     rectMob[j].second = std::max(0, rectMob[j].second - vProjectile[i].getDmg());
                     vMob[j].setHp(rectMob[j].second);
+                }
+            }
+            if(current_level == numLevel)
+            {
+                if(collision(vProjectile[i].getHitBox(), boss.getBossHitbox()) && boss.vulnerable())
+                {
+                    boss.takeDamage(vProjectile[i].getDmg());
                 }
             }
         }

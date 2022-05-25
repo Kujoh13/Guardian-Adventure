@@ -202,6 +202,7 @@ void Character::drawAttack(SDL_Renderer* renderer, int view)
     {
         finishAttack = true;
     }
+    if(frame == _victory.second) frame -= _attack.second;
     status = STATUS::ATTACK;
 
     nRect.x = (frame % _attack.first) * charSize;
@@ -233,7 +234,7 @@ void Character::show(SDL_Renderer* renderer, int view)
         tempRect.w = melee.w;
         tempRect.h = melee.h;
 
-        if(facing) tempRect.x -= melee.w - charWidth;
+        if(facing) tempRect.x -= 2 * melee.x + melee.w - rect.w;
 
         tempRect.x -= view;
         SDL_RenderDrawRect(renderer, &tempRect);
@@ -254,7 +255,7 @@ void Character::show(SDL_Renderer* renderer, int view)
 
     nextAttack++;
 
-    if(nStatus == STATUS::ATTACK || !finishAttack)
+    if(nStatus == STATUS::ATTACK)
     {
         drawAttack(renderer, view);
     }
@@ -265,14 +266,12 @@ void Character::show(SDL_Renderer* renderer, int view)
         status = STATUS::JUMP;
         return;
     }
-
     else if(nStatus == STATUS::IDLE) drawIdle(renderer, view);
     else if(nStatus == STATUS::MOVE) drawMove(renderer, view);
 }
 
-bool Character::handleInput(SDL_Event event)
+void Character::handleInput(SDL_Event event)
 {
-    bool flag = true;
     if(event.type == SDL_KEYDOWN)
     {
         switch(event.key.keysym.sym)
@@ -333,25 +332,10 @@ bool Character::handleInput(SDL_Event event)
 
 
     }
-    if(pressed['a']) flag = false;
-    if(pressed['d']) flag = false;
-    if(pressed[' ']) flag = false;
-    if(pressed['k']) flag = false;
-    if(!flag)
-        return true;
 }
 
 void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rectMob, std::vector<Projectile>& vProjectile)
 {
-
-    if(pressed[' '] && isFalling == false && status != 4) {
-        isJumping = isFalling = true;
-        nStatus = STATUS::JUMP;
-        velY = -40;
-    }
-
-    pressed[' '] = false;
-
     if(isJumping || isFalling){
         velY += gravity;
 
@@ -374,10 +358,24 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
         return;
     }
 
-    if(rect.x >= MAP->getVictory())
+    if(rect.x >= MAP->getVictory() || nStatus == STATUS::VICTORY)
     {
         nStatus = STATUS::VICTORY;
         return;
+    }
+
+    if(!isFalling && !pressed['a'] && !pressed['d'] && (!pressed['k'] || (pressed['k'] && nextAttack < framePerAttack)))
+        nStatus = STATUS::IDLE;
+
+    if(pressed[' '] && isFalling == false)
+    {
+        isJumping = isFalling = true;
+        nStatus = STATUS::JUMP;
+        velY = -40;
+    }
+    else if(isFalling == true)
+    {
+        nStatus = STATUS::JUMP;
     }
 
     if(pressed['a'])
@@ -392,18 +390,20 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
         facing = 0;
         rect.x += velX;
     }
+    pressed[' '] = false;
 
     if(rect.x < 0) rect.x = 0;
-    if(rect.x > MAP->getMapWidth() * TILE_SIZE) rect.x = MAP->getMapWidth() * TILE_SIZE;
+    if(rect.x > MAP->getMapWidth() * TILE_SIZE - rect.w) rect.x = MAP->getMapWidth() * TILE_SIZE - rect.w;
 
     collisionX(MAP);
-
     if(pressed['k'] && nextAttack >= framePerAttack)
     {
         nStatus = STATUS::ATTACK;
         finishAttack = false;
         nextAttack = 0;
     }
+    else if(!finishAttack)
+        nStatus = STATUS::ATTACK;
 
     if(!finishAttack && frame == frameAttack && type == TYPE::MELEE){
 
@@ -413,7 +413,7 @@ void Character::tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rect
         tempRect.w = melee.w;
         tempRect.h = melee.h;
 
-        if(facing) tempRect.x -= melee.w - charWidth;
+        if(facing) tempRect.x -= 2 * melee.x + melee.w - rect.w;
 
         for(int i = 0; i < rectMob.size(); i++){
             if(collision(tempRect, rectMob[i].first)){
@@ -536,4 +536,16 @@ int Character::getStatus()
 bool Character::getAttack()
 {
     return finishAttack;
+}
+
+SDL_Rect Character::getMelee()
+{
+    SDL_Rect tempRect = rect;
+    tempRect.x += melee.x;
+    tempRect.y += melee.y;
+    tempRect.w = melee.w;
+    tempRect.h = melee.h;
+
+    if(facing) tempRect.x -= 2 * melee.x + melee.w - rect.w;
+    return tempRect;
 }

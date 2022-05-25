@@ -25,6 +25,10 @@ public:
     void character_heal();
     void bomb_explosion();
     void character_attack(int cur_character);
+    void character_move(int type);
+    void character_jump();
+    void setMove() {nextMove = 0;}
+    void play_boss_audio(int status);
 protected:
     Mix_Music* bgm_level[numLevel];
     Mix_Music* startScreen;
@@ -42,6 +46,11 @@ protected:
     Mix_Chunk* explosion;
     Mix_Chunk* heal;
     Mix_Chunk* char_attack[numCharacter];
+    Mix_Chunk* walk;
+    Mix_Chunk* fly;
+    int nextMove;
+    Mix_Chunk* jump;
+    Mix_Chunk* bossAudio[numStatus];
 };
 
 #endif //AUDIOPLAYER_H_

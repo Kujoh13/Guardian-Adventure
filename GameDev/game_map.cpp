@@ -12,6 +12,9 @@ game_map::game_map()
     info = NULL;
     bush_width = NULL;
     bush_height = NULL;
+
+    victory_w = 1300;
+    victory_h = 0;
 }
 game_map::~game_map()
 {
@@ -192,7 +195,7 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
     return Map_Sheet != NULL && background != NULL;
 }
 
-void game_map::render(SDL_Renderer* renderer, int view, bool map_cleared){
+void game_map::render(SDL_Renderer* renderer, int view, bool map_cleared, bool isBossLevel){
 
     SDL_Rect rect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
@@ -205,19 +208,22 @@ void game_map::render(SDL_Renderer* renderer, int view, bool map_cleared){
 
     int numGrass = 0;
 
-    if(map_cleared == false)
-        for(int i = 0; i <= victory_h / TILE_SIZE; i++)
-        {
-            info[i][victory_w / TILE_SIZE - 1] = 1;
-            rect.x = victory_w - TILE_SIZE - view;
-            rect.y = i * TILE_SIZE;
-            SDL_RenderCopy(renderer, Block[Num_Block - 1], NULL, &rect);
-        }
-    else
-        for(int i = 0; i <= victory_h / TILE_SIZE; i++)
-        {
-            info[i][victory_w / TILE_SIZE - 1] = 0;
-        }
+    if(!isBossLevel)
+    {
+        if(map_cleared == false)
+            for(int i = 0; i <= victory_h / TILE_SIZE; i++)
+            {
+                info[i][victory_w / TILE_SIZE - 1] = 1;
+                rect.x = victory_w - TILE_SIZE - view;
+                rect.y = i * TILE_SIZE;
+                SDL_RenderCopy(renderer, Block[Num_Block - 1], NULL, &rect);
+            }
+        else
+            for(int i = 0; i <= victory_h / TILE_SIZE; i++)
+            {
+                info[i][victory_w / TILE_SIZE - 1] = 0;
+            }
+    }
 
     for(int i = 0; i < Map_Height; i++)
         for(int j = 0; j < Map_Width; j++)

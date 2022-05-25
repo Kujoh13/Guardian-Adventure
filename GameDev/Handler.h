@@ -11,6 +11,7 @@
 #include "Projectile.h"
 #include "lp.h"
 #include "AudioPlayer.h"
+#include "BossLevel.h"
 
 class Handler
 {
@@ -54,6 +55,8 @@ protected:
     int prev, prev_map, prev_char;
     int *prev_char_level;
     AudioPlayer Audio_Player;
+    int **char_growth;
+    BossLevel boss;
 };
 
 

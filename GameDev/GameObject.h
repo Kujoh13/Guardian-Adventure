@@ -8,7 +8,8 @@ class GameObject
 public:
     GameObject();
     ~GameObject();
-    void SetRect(const int &x, const int &y){rect.x = x, rect.y = y;}
+    void setRect(const int &x, const int &y){rect.x = x, rect.y = y;}
+    void setRect(SDL_Rect _rect) {rect = _rect;}
     SDL_Rect getRect() {return rect;}
     SDL_Texture* getObject() {return pObject;}
 
@@ -36,11 +37,12 @@ public:
     void setH(int h) {rect.h = h;}
     void setVelX(int _velX) {velX = _velX;}
     void setVelY(int _velY) {velY = _velY;}
-    void setHp(int _hp) {hp = std::max(_hp, 0);}
+    void setHp(int _hp) {hp = std::min(std::max(_hp, 0), maxHp);}
     void setDmg(int _dmg) {dmg = _dmg;}
     void setMaxHp(int _maxHp) {maxHp = _maxHp;}
     void setLevel(int _level) {level = _level;}
     void setObjectId(int _objectId, bool ok) {if(objectId == 0 || ok) objectId = _objectId;}
+    void takeDamage(int damage) {hp = std::max(0, hp - damage);}
 
 protected:
     SDL_Texture* pObject;

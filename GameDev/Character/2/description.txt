@@ -1,4 +1,4 @@
 Mecha Warrior Oghma
-- 25% chance to dodge ranged 
+- 50% chance to block ranged 
 attack and reflect melee 
 attacks to attacker.

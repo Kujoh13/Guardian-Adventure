@@ -1,0 +1,4 @@
+Nine-tailed Fox Garam
+- High damage ranged attack that
+can heal 10% of HP with 25% 
+chance.

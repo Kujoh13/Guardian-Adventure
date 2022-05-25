@@ -12,7 +12,7 @@ public:
     void loadTexture(SDL_Renderer* renderer);
     void startScreen(SDL_Renderer* renderer);
     void ingame(SDL_Renderer* renderer, int char_hp, int char_dmg, int numCoin, int numGem, bool paused, int level_end);
-    void levelSelection(SDL_Renderer* renderer, int cur_level, int cur_character, int* character_level, int numCoin, int numGem, int lastLevel, int baseHp, int baseDmg);
+    void levelSelection(SDL_Renderer* renderer, int cur_level, int cur_character, int* character_level, int numCoin, int numGem, int lastLevel, int baseHp, int baseDmg, int **char_growth);
     void handleMouseInput(int x, int y, int &isRunning, int &cur_level, int &cur_character, int* character_level, int &numCoin, int &numGem, int lastLevel, bool &paused);
     void handleKeyInput(SDL_Event event, bool &paused, int &isRunning);
     int getFlag() {return flag;}

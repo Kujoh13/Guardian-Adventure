@@ -10,7 +10,7 @@ public:
     game_map();
     ~game_map();
     bool loadMap(std::string path, SDL_Renderer* renderer, int level);
-    void render(SDL_Renderer* renderer, int view, bool map_cleared);
+    void render(SDL_Renderer* renderer, int view, bool map_cleared, bool isBossLevel);
     void setNumBlock(int _NumBlock);
     int getNumBlock(int _NumBlock);
     void setNumBush(int _NumBush);

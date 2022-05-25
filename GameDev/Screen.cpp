@@ -23,7 +23,6 @@ Screen::Screen()
     cost = new long long[numCharacter];
     for(int i = 0; i < numCharacter; i++)
         cost[i] = 20;
-
     prev = 0;
 }
 
@@ -349,7 +348,7 @@ void Screen::handleKeyInput(SDL_Event event, bool &paused, int &isRunning)
     }
 }
 
-void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_character, int* character_level, int numCoin, int numGem, int lastLevel, int baseHp, int baseDmg)
+void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_character, int* character_level, int numCoin, int numGem, int lastLevel, int baseHp, int baseDmg, int **char_growth)
 {
     ///arrow
     if(arrow_flag == 0)
@@ -589,8 +588,8 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
         int newHp = baseHp, newDmg = baseDmg;
         if(character_level[cur_character] > 0)
         {
-            newHp += (character_level[cur_character] - 1) * 2;
-            newDmg += character_level[cur_character] - 1;
+            newHp += (character_level[cur_character] - 1) * char_growth[cur_character][1];
+            newDmg += (character_level[cur_character] - 1) * char_growth[cur_character][0];
         }
 
         SDL_Rect hpRect, dmgRect;
@@ -604,7 +603,7 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
 
         if(character_level[cur_character] > 0)
         {
-            sf = TTF_RenderText_Solid(textFontBig, int2str(newDmg + 1).c_str(), green);
+            sf = TTF_RenderText_Solid(textFontBig, int2str(newDmg + char_growth[cur_character][0]).c_str(), green);
             tt = SDL_CreateTextureFromSurface(renderer, sf);
             dmgRect.w = sf->w;
             dmgRect.h = sf->h;
@@ -623,7 +622,7 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
 
         if(character_level[cur_character] > 0)
         {
-            sf = TTF_RenderText_Solid(textFontBig, int2str(newHp + 2).c_str(), green);
+            sf = TTF_RenderText_Solid(textFontBig, int2str(newHp + char_growth[cur_character][1]).c_str(), green);
             tt = SDL_CreateTextureFromSurface(renderer, sf);
             hpRect.w = sf->w;
             hpRect.h = sf->h;
@@ -672,7 +671,7 @@ void Screen::levelSelection(SDL_Renderer* renderer, int cur_level, int cur_chara
 
         SDL_Rect dRect;
         dRect.x = infoBox.getX() + 10;
-        dRect.y = infoBox.getY() + charSize - 170;
+        dRect.y = infoBox.getY() + charSize - 130;
 
         for(int i = 0; i < description.size(); i++)
         {

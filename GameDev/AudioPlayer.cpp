@@ -8,6 +8,9 @@ AudioPlayer::AudioPlayer()
     for(int i = 0; i < numCharacter; i++)
         char_attack[i] = NULL;
 
+    for(int i = 0; i < numStatus; i++)
+        bossAudio[i] = NULL;
+
     startScreen = NULL;
     levelSelection = NULL;
     collect_item = NULL;
@@ -21,6 +24,11 @@ AudioPlayer::AudioPlayer()
     lose = NULL;
     heal = NULL;
     explosion = NULL;
+    walk = NULL;
+    fly = NULL;
+    jump = NULL;
+
+    nextMove = 0;
 }
 AudioPlayer::~AudioPlayer()
 {
@@ -29,6 +37,9 @@ AudioPlayer::~AudioPlayer()
 
     for(int i = 0; i < numCharacter; i++)
         Mix_FreeChunk(char_attack[i]);
+
+    for(int i = 0; i < numStatus; i++)
+        Mix_FreeChunk(bossAudio[i]);
 
     Mix_FreeMusic(startScreen);
     Mix_FreeMusic(levelSelection);
@@ -44,6 +55,9 @@ AudioPlayer::~AudioPlayer()
     Mix_FreeChunk(mob_die);
     Mix_FreeChunk(heal);
     Mix_FreeChunk(explosion);
+    Mix_FreeChunk(fly);
+    Mix_FreeChunk(walk);
+    Mix_FreeChunk(jump);
 }
 
 void AudioPlayer::loadAudioFiles()
@@ -67,11 +81,20 @@ void AudioPlayer::loadAudioFiles()
     mob_die = Mix_LoadWAV("audio/mob_die.wav");
     heal = Mix_LoadWAV("audio/heal.wav");
     explosion = Mix_LoadWAV("audio/explosion.wav");
+    walk = Mix_LoadWAV("audio/walk.wav");
+    fly = Mix_LoadWAV("audio/fly.wav");
+    jump = Mix_LoadWAV("audio/jump.wav");
 
     for(int i = 0; i < numCharacter; i++)
     {
         std::string path = "audio/attack_" + int2str(i) + ".wav";
         char_attack[i] = Mix_LoadWAV(path.c_str());
+    }
+
+    for(int i = 0; i < numStatus; i++)
+    {
+        std::string path = "audio/boss_" + int2str(i) + ".wav";
+        bossAudio[i] = Mix_LoadWAV(path.c_str());
     }
 }
 
@@ -161,4 +184,25 @@ void AudioPlayer::bomb_explosion()
 void AudioPlayer::character_attack(int cur_character)
 {
     Mix_PlayChannel(-1, char_attack[cur_character], 0);
+}
+
+void AudioPlayer::character_move(int type)
+{
+    if(nextMove == 0){
+        if(type) Mix_PlayChannel(-1, fly, 0);
+        else Mix_PlayChannel(-1, walk, 0);
+    }
+    nextMove++;
+    nextMove %= 13;
+}
+
+void AudioPlayer::character_jump()
+{
+    Mix_PlayChannel(-1, jump, 0);
+}
+
+void AudioPlayer::play_boss_audio(int status)
+{
+    if(bossAudio[status] == NULL) return;
+    Mix_PlayChannel(-1, bossAudio[status], 0);
 }

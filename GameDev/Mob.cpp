@@ -160,7 +160,7 @@ void Mob::show(SDL_Renderer* renderer, int view)
         tempRect.w = melee.w;
         tempRect.h = melee.h;
 
-        if(facing) tempRect.x -= melee.w - rect.w;
+        if(facing) tempRect.x -= 2 * melee.x + melee.w - rect.w;
 
         tempRect.x -= view;
 
@@ -245,10 +245,10 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
         tempRect.w = melee.w;
         tempRect.h = melee.h;
 
-        if(facing) tempRect.x -= melee.w - charWidth;
+        if(facing) tempRect.x -= 2 * melee.x + melee.w - rect.w;
 
         if(collision(tempRect, character->getRect())){
-            int chance = Rand(1, 4);
+            int chance = Rand(1, 2);
             character->setHp(character->getHp() - dmg);
             if(chance == 1 && character->getId() == 2)
                 hp = std::max(0, hp - dmg);

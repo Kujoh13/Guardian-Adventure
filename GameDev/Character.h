@@ -12,7 +12,7 @@ public:
     Character();
     ~Character();
     void show(SDL_Renderer* renderer, int view);
-    bool handleInput(SDL_Event event);
+    void handleInput(SDL_Event event);
     bool loadCharacter(std::string path, SDL_Renderer* renderer, int _id);
     void tick(game_map* MAP, std::vector<std::pair<SDL_Rect, int> >& rectMob, std::vector<Projectile>& vProjectile);
     void collisionX(game_map* MAP);
@@ -29,6 +29,11 @@ public:
     int getId() {return id;}
     std::pair<int, int> getAttackBar();
     bool startAttack() {return nextAttack == 0;}
+    bool getMove() {return (pressed['a'] || pressed['d']);}
+    bool onGround() {return (!isFalling);}
+    bool jumped() {return pressed[' '] && isFalling == false;}
+    SDL_Rect getMelee();
+    bool meleeAttack(){return !finishAttack && frame == frameAttack && type == TYPE::MELEE;}
 
 protected:
     SDL_Texture* idleAnimation[2];

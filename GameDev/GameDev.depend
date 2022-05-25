@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1651509433 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\main.cpp
+1653250882 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\main.cpp
 	"Handler.h"
 
 1651245808 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.cpp
 	"BasicFunction.h"
 
-1653045968 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.h
+1653470049 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\basicfunction.h
 	<bits/stdc++.h>
 	<SDL.h>
 	<Windows.h>
@@ -16,33 +16,33 @@
 1651427355 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\gameobject.cpp
 	"GameObject.h"
 
-1651427596 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\gameobject.h
+1653491585 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\gameobject.h
 	"BasicFunction.h"
 
-1652978430 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
+1653248503 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
 	"game_map.h"
 
-1651548582 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
+1653247705 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
 	"BasicFunction.h"
 	"GameObject.h"
 
-1651757603 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.cpp
+1653473481 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.cpp
 	"Screen.h"
 
-1651378317 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.h
+1653101978 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\screen.h
 	"BasicFunction.h"
 	"GameObject.h"
 
-1653032379 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.cpp
+1653487923 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.cpp
 	"Character.h"
 
-1653040892 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.h
+1653494448 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\character.h
 	"GameObject.h"
 	"BasicFunction.h"
 	"game_map.h"
 	"Projectile.h"
 
-1653046028 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\mob.cpp
+1653467628 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\mob.cpp
 	"Mob.h"
 
 1652453407 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\mob.h
@@ -78,7 +78,7 @@
 1651296649 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\lp.cpp
 	"lp.h"
 
-1651603089 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\handler.h
+1653248912 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\handler.h
 	"bits/stdc++.h"
 	"BasicFunction.h"
 	"GameObject.h"
@@ -89,8 +89,9 @@
 	"Projectile.h"
 	"lp.h"
 	"AudioPlayer.h"
+	"BossLevel.h"
 
-1653046587 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\handler.cpp
+1653488421 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\handler.cpp
 	"Handler.h"
 
 1651378416 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\ability.h
@@ -99,10 +100,22 @@
 	"Mob.h"
 	"Projectile.h"
 
-1653040892 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\audioplayer.h
+1653300302 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\audioplayer.h
 	"BasicFunction.h"
 	<SDL_mixer.h>
 
-1653040892 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\audioplayer.cpp
+1653316804 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\audioplayer.cpp
 	"AudioPlayer.h"
+
+1653493459 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\bosslevel.cpp
+	"BossLevel.h"
+
+1653495883 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\bosslevel.h
+	"BasicFunction.h"
+	"Character.h"
+	"GameObject.h"
+	"Projectile.h"
+	"AudioPlayer.h"
+	<SDL_ttf.h>
+	"Item.h"
 

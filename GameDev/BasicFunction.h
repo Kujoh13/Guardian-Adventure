@@ -45,17 +45,18 @@ const double gravity = 3;
 const double MAX_FALL_SPEED = 25;
 const double MAX_RUN_SPEED = 15;
 
-const int numCharacter = 4;
+const int numCharacter = 6;
 const int numItem = 4;
 const int charSize = 300;
-const int charWidth = 40;
-const int charHeight = 85;
 const int portraitSize = 100;
+const int bossSize = 900;
+const int numStatus = 11;
+const int numBossProjectile = 2;
 
-const int numLevel = 3;
+const int numLevel = 4;
 
 //Projectiles
-const int numProjectile = 6;
+const int numProjectile = 7;
 const double pi = acos(-1);
 
 #endif
