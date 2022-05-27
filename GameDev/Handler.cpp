@@ -103,8 +103,6 @@ void Handler::tick(SDL_Renderer* renderer)
                 click = false;
             }
 
-
-
             if(prev == 2 && isRunning == 3)
             {
                 Audio_Player.playButton();
@@ -167,6 +165,8 @@ void Handler::tick(SDL_Renderer* renderer)
     }
     else if(isRunning == 3){
         if(paused) return;
+
+
 
         for(int i = 0; i < vMob.size(); i++)
             rectMob.push_back({vMob[i].getRect(), vMob[i].getHp()});
@@ -295,7 +295,7 @@ void Handler::tick(SDL_Renderer* renderer)
                vMob.pop_back();
             }
             else
-                vMob[i].tick(MAP, vProjectile, &_character[current_character]);
+                vMob[i].tick(MAP, vProjectile, &_character[current_character], vExplosion);
         }
         if(vProjectile.size())
         {
@@ -309,13 +309,9 @@ void Handler::tick(SDL_Renderer* renderer)
                     vProjectile[i].setObjectId(++id, 0);
                     if(vProjectile[i].done())
                     {
-                        if(vProjectile[i].getThrew()){
-                            if(distance(vProjectile[i].getHitBox(), _character[current_character].getRect()) <= vProjectile[i].getRadius())
-                            {
-                                int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
-                                _character[current_character].setHp(curHp);
-                            }
-                            vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
+                        if(vProjectile[i].getThrew())
+                        {
+                            vExplosion.push_back({vProjectile[i].getHitBox(), vProjectile[i].getRadius(), vProjectile[i].getDmg(), 15});
                             Audio_Player.bomb_explosion();
                         }
                         std::swap(vProjectile[i], vProjectile.back());
@@ -333,7 +329,8 @@ void Handler::tick(SDL_Renderer* renderer)
                             }
                             if(vProjectile[i].getThrew())
                             {
-                                vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
+                                vExplosion.push_back({vProjectile[i].getHitBox(), vProjectile[i].getRadius(), vProjectile[i].getDmg(), 15});
+                                Audio_Player.bomb_explosion();
                             }
                             std::swap(vProjectile[i], vProjectile.back());
                             vProjectile.pop_back();
@@ -392,7 +389,8 @@ void Handler::tick(SDL_Renderer* renderer)
             }
         }
 
-        if(v_lp.size()){
+        if(v_lp.size())
+        {
             for(int i = v_lp.size() - 1; i >= 0; i--)
             {
                 v_lp[i].tick(_character[current_character].getRect(), MAP, vItem);
@@ -404,6 +402,15 @@ void Handler::tick(SDL_Renderer* renderer)
             }
         }
         rectMob.clear();
+        for(int i = 0; i < vExplosion.size(); i++)
+        {
+            if(distance(vExplosion[i].rect, _character[current_character].getRect()) <= vExplosion[i].radius)
+            {
+                int curHp = _character[current_character].getHp() - vExplosion[i].dmg;
+                _character[current_character].setHp(curHp);
+            }
+            vExplosion[i].frame--;
+        }
     }
 
 }
@@ -432,7 +439,7 @@ void Handler::show(SDL_Renderer* renderer)
 
             /// h / mh = x / 40 x = h * 40
 
-            SDL_Rect tRect = {vMob[i].getX() - view, vMob[i].getY() - 5, 42, 7};
+            SDL_Rect tRect = {vMob[i].getX() - view, vMob[i].getY() - 20, 42, 7};
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
@@ -442,7 +449,7 @@ void Handler::show(SDL_Renderer* renderer)
 
             int w = vMob[i].getHp() * 40 / vMob[i].getMaxHp();
 
-            tRect = {vMob[i].getX() + 1 - view, vMob[i].getY() - 4, w, 5};
+            tRect = {vMob[i].getX() + 1 - view, vMob[i].getY() - 19, w, 5};
 
             SDL_RenderFillRect(renderer, &tRect);
 
@@ -480,11 +487,6 @@ void Handler::show(SDL_Renderer* renderer)
             boss.show(renderer, &Audio_Player);
 
         {
-            SDL_Rect cRect = _character[current_character].getRect();
-
-            cRect.x -= view;
-
-            SDL_RenderDrawRect(renderer, &cRect);
 
             SDL_Rect rect = {_character[current_character].getX() - view, _character[current_character].getY() - 20, 42, 7};
 
@@ -531,9 +533,6 @@ void Handler::show(SDL_Renderer* renderer)
 
             SDL_Rect tRect = vProjectile[i].getRect();
             tRect.x -= view;
-
-            SDL_RenderDrawRect(renderer, &tRect);
-
             SDL_RenderCopyEx(renderer, pr[vProjectile[i].getId()], NULL, &tRect, vProjectile[i].getAngle(), NULL, SDL_FLIP_NONE);
         }
 
@@ -547,15 +546,14 @@ void Handler::show(SDL_Renderer* renderer)
 
         if(vExplosion.size())
         for(int i = vExplosion.size() - 1; i >= 0; i--){
-            SDL_Rect tRect = vExplosion[i].first;
-            int r = vExplosion[i].second.first;
-            tRect.x = (2 * vExplosion[i].first.x + vExplosion[i].first.w) / 2 - sqrt(2) / 2 * r - view;
-            tRect.y = (2 * vExplosion[i].first.y + vExplosion[i].first.h) / 2 - sqrt(2) / 2 * r;
+            SDL_Rect tRect = vExplosion[i].rect;
+            int r = vExplosion[i].radius;
+            tRect.x = (2 * vExplosion[i].rect.x + vExplosion[i].rect.w) / 2 - sqrt(2) / 2 * r - view;
+            tRect.y = (2 * vExplosion[i].rect.y + vExplosion[i].rect.h) / 2 - sqrt(2) / 2 * r;
             tRect.w = sqrt(2) * r;
             tRect.h = sqrt(2) * r;
             SDL_RenderCopy(renderer, explosion, NULL, &tRect);
-            vExplosion[i].second.second--;
-            if(vExplosion[i].second.second == 0)
+            if(vExplosion[i].frame == 0)
             {
                 std::swap(vExplosion[i], vExplosion.back());
                 vExplosion.pop_back();
@@ -616,14 +614,17 @@ bool Handler::loadLevel(int level, SDL_Renderer* renderer)
         }
     }
 
-    lp new_lp;
-    new_lp.setType(1);
-    new_lp.setW(70);
-    new_lp.setH(70);
-    new_lp.setX(MAP->get_lp_pos().back());
-    MAP->pop();
-    new_lp.loadVar({4, 14}, {4, 11}, {4, 17});
-    v_lp.push_back(new_lp);
+    if(level < numLevel)
+    {
+        lp new_lp;
+        new_lp.setType(1);
+        new_lp.setW(70);
+        new_lp.setH(70);
+        new_lp.setX(MAP->get_lp_pos().back());
+        MAP->pop();
+        new_lp.loadVar({4, 14}, {4, 11}, {4, 17});
+        v_lp.push_back(new_lp);
+    }
 
     return 1;
 }
@@ -734,7 +735,8 @@ void Handler::character1()
                     int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
                     _character[current_character].setHp(curHp);
                 }
-                vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
+                vExplosion.push_back({vProjectile[i].getHitBox(), vProjectile[i].getRadius(), vProjectile[i].getDmg(), 15});
+                Audio_Player.bomb_explosion();
             }
             std::swap(vProjectile[i], vProjectile.back());
             vProjectile.pop_back();
@@ -747,7 +749,8 @@ void Handler::character1()
                 _character[current_character].setHp(curHp);
                 if(vProjectile[i].getThrew())
                 {
-                    vExplosion.push_back({vProjectile[i].getHitBox(), {vProjectile[i].getRadius(), 15}});
+                    vExplosion.push_back({vProjectile[i].getHitBox(), vProjectile[i].getRadius(), vProjectile[i].getDmg(), 15});
+                    Audio_Player.bomb_explosion();
                 }
                 std::swap(vProjectile[i], vProjectile.back());
                 vProjectile.pop_back();
@@ -774,5 +777,6 @@ void Handler::character1()
                 }
             }
         }
+
     }
 }

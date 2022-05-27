@@ -218,28 +218,6 @@ void Character::show(SDL_Renderer* renderer, int view)
 
     SDL_RenderCopy(renderer, portrait, NULL, &pRect);
 
-    //std::cout << view << '\n';
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-
-    SDL_Rect tRect = rect;
-    tRect.x -= view;
-
-    SDL_RenderDrawRect(renderer, &tRect);
-
-    if(type == TYPE::MELEE)
-    {
-        SDL_Rect tempRect = rect;
-        tempRect.x += melee.x;
-        tempRect.y += melee.y;
-        tempRect.w = melee.w;
-        tempRect.h = melee.h;
-
-        if(facing) tempRect.x -= 2 * melee.x + melee.w - rect.w;
-
-        tempRect.x -= view;
-        SDL_RenderDrawRect(renderer, &tempRect);
-    }
-
     if(nStatus != status && (finishAttack || nextAttack == 0)) frame = 0;
 
     if(nStatus == STATUS::DIED)

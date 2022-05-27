@@ -33,7 +33,7 @@ protected:
     std::vector<Item> vItem, vItem_temp;
     std::vector<lp> v_lp;
     std::vector<std::pair<SDL_Rect, int> > rectMob;
-    std::vector<std::pair<SDL_Rect, std::pair<int, int> > > vExplosion;
+    std::vector<Explosion> vExplosion;
     SDL_Texture* pr[numProjectile];
     SDL_Texture* itemDrop[numItem];
     SDL_Texture* lpTexture;

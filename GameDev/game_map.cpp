@@ -168,11 +168,14 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
             else
             {
                 info[i][j] = 0;
-                if(rgb == yellow) lp_x = j * TILE_SIZE + 11 * TILE_SIZE;
-                if(rgb == pink)
+                if(level < numLevel)
                 {
-                    victory_w = j * TILE_SIZE;
-                    victory_h = (i + 4) * TILE_SIZE;
+                    if(rgb == yellow) lp_x = j * TILE_SIZE + 11 * TILE_SIZE;
+                    if(rgb == pink)
+                    {
+                        victory_w = j * TILE_SIZE;
+                        victory_h = (i + 4) * TILE_SIZE;
+                    }
                 }
             }
         }
@@ -190,7 +193,8 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
     file.close();
     std::sort(lp_pos.begin(), lp_pos.end(), std::greater<int> ());
 
-    lp_pos.push_back(lp_x);
+    if(level < numLevel)
+        lp_pos.push_back(lp_x);
 
     return Map_Sheet != NULL && background != NULL;
 }

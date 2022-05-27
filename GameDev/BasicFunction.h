@@ -10,6 +10,13 @@
 
 typedef std::pair<int, int> pii;
 
+struct Explosion{
+    SDL_Rect rect;
+    int radius;
+    int dmg;
+    int frame;
+};
+
 static SDL_Window* gWindow = NULL;
 static SDL_Renderer* gRenderer = NULL;
 
@@ -53,10 +60,10 @@ const int bossSize = 900;
 const int numStatus = 11;
 const int numBossProjectile = 2;
 
-const int numLevel = 4;
+const int numLevel = 6;
 
 //Projectiles
-const int numProjectile = 7;
+const int numProjectile = 8;
 const double pi = acos(-1);
 
 #endif

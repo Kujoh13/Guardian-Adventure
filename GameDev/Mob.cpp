@@ -26,6 +26,9 @@ Mob::Mob()
 
     for(int i = 0; i < 3; i++)
         itemDrop[i] = 0;
+
+    inFollowRange = false;
+    laserTick = 0;
 }
 Mob::~Mob()
 {
@@ -62,9 +65,17 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
         file >> melee.x >> melee.y >> melee.w >> melee.h;
         file >> frameAttack;
     }
-    else{
+    else if(type == TYPE::THROW || type == TYPE::RANGED){
         file >> prSpeed;
         if(type == TYPE::THROW) file >> prRadius;
+    }
+    else if(type == TYPE::FOLLOW)
+    {
+        file >> velY;
+    }
+    else if(type == TYPE::BOMB)
+    {
+        file >> prRadius;
     }
     file >> itemDrop[0];
     file.close();
@@ -101,6 +112,12 @@ bool Mob::loadMob(std::string path, SDL_Renderer* renderer)
         else std::cout << SDL_GetError() << '\n';
     }
 
+    if(type == TYPE::LASER)
+    {
+        loadedSurface = IMG_Load((path + "/laser.png").c_str());
+        laser = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+    }
+
     SDL_FreeSurface(loadedSurface);
 
     return 1;
@@ -117,7 +134,7 @@ void Mob::drawIdle(SDL_Renderer* renderer, int view)
     SDL_RenderCopy(renderer, idleAnimation[facing], &nRect, &tRect);
 
     frame++;
-    if(frame == _idle.second) frame -= _idle.second;
+    if(frame >= _idle.second) frame %= _idle.second;
 }
 
 void Mob::drawMove(SDL_Renderer* renderer, int view)
@@ -129,7 +146,7 @@ void Mob::drawMove(SDL_Renderer* renderer, int view)
     nRect.y = (frame / _move.first) * charSize;
     SDL_RenderCopy(renderer, moveAnimation[facing], &nRect, &tRect);
     frame++;
-    if(frame == _move.second) frame -= _move.second;
+    if(frame >= _move.second) frame %= _move.second;
 }
 
 void Mob::drawAttack(SDL_Renderer* renderer, int view)
@@ -151,73 +168,121 @@ void Mob::show(SDL_Renderer* renderer, int view)
     SDL_Rect nRect = rect;
     nRect.x -= view;
 
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+
     SDL_RenderDrawRect(renderer, &nRect);
 
-    if(type == TYPE::MELEE){
-        SDL_Rect tempRect = rect;
-        tempRect.x += melee.x;
-        tempRect.y += melee.y;
-        tempRect.w = melee.w;
-        tempRect.h = melee.h;
+    if(type != TYPE::FOLLOW && type != TYPE::LASER)
+    {
+        if(nextAttack >= _attack.second)
+        {
+            if(nextAttack == _attack.second) frame = 0;
+            if(idle) drawIdle(renderer, view);
+            else drawMove(renderer, view);
+        }
+        else
+        {
+            drawAttack(renderer, view);
+        }
 
-        if(facing) tempRect.x -= 2 * melee.x + melee.w - rect.w;
-
-        tempRect.x -= view;
-
-        SDL_RenderDrawRect(renderer, &tempRect);
+        nextAttack++;
+        if(nextAttack == framePerAttack)
+        {
+            nextAttack -= framePerAttack;
+            frame = 0;
+        }
     }
+    else if(type == FOLLOW)
+    {
+        nextAttack++;
+        if(nextAttack >= framePerAttack)
+            nextAttack = 0;
+        if(inFollowRange)
+        {
+            if(frame >= _attack.second)
+                frame -= _attack.second;
+            drawAttack(renderer, view);
+        }
+        else
+            drawIdle(renderer, view);
 
-    if(nextAttack >= _attack.second){
-        if(nextAttack == _attack.second) frame = 0;
-        if(idle) drawIdle(renderer, view);
-        else drawMove(renderer, view);
     }
-    else {
-        drawAttack(renderer, view);
-    }
+    else
+    {
 
-    nextAttack++;
-    if(nextAttack == framePerAttack) {
-        nextAttack -= framePerAttack;
-        frame = 0;
+        if(nextAttack >= framePerAttack)
+        {
+            laserTick = 0;
+            nextAttack = 0;
+        }
+        if(laserTick < 90)
+        {
+            if(frame >= _attack.second)
+                frame %= _attack.second;
+            drawAttack(renderer, view);
+            SDL_Rect range = {rect.x - view + rect.w / 2, rect.y, SCREEN_WIDTH, 70};
+            if(!facing) range.x -= SCREEN_WIDTH;
+            SDL_RenderCopy(renderer, laser, NULL, &range);
+        }
+        else
+        {
+            drawIdle(renderer, view);
+        }
+        nextAttack++;
+        laserTick++;
     }
-
 }
 
-void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* character)
+void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* character, std::vector<Explosion>& vExplosion)
 {
-    if(move)
+    if(type != TYPE::FOLLOW && type != TYPE::LASER)
     {
-        if(direction) rect.x -= velX;
-        else rect.x += velX;
+        if(move)
+        {
+            if(direction) rect.x -= velX;
+            else rect.x += velX;
+        }
+        if(type == TYPE::RANGED || type == TYPE::THROW)
+        {
+            if(rect.x >= character->getX()) facing = 1;
+            else facing = 0;
+        }
+        else
+        {
+            facing = direction;
+        }
+
+        if(move){
+            if(rect.x > maxX - rect.w)
+            {
+                rect.x = maxX - rect.w;
+                direction = 1;
+            }
+            else if(rect.x < minX)
+            {
+                rect.x = minX;
+                direction = 0;
+            }
+        }
+
+        collisionX(MAP);
+
+        rect.y += MAX_FALL_SPEED;
+        collisionY(MAP);
     }
-    if(type == TYPE::RANGED || type == TYPE::THROW)
+    else if(type == TYPE::FOLLOW)
     {
         if(rect.x >= character->getX()) facing = 1;
         else facing = 0;
     }
     else
     {
-        facing = direction;
-    }
-
-    if(move){
-        if(rect.x > maxX - rect.w)
+        if(laserTick >= 90)
         {
-            rect.x = maxX - rect.w;
-            direction = 1;
-        }
-        else if(rect.x < minX)
-        {
-            rect.x = minX;
-            direction = 0;
+            if(rect.x <= character->getX()) facing = 1;
+            else facing = 0;
         }
     }
-
-    collisionX(MAP);
-
-    rect.y += MAX_FALL_SPEED;
-    collisionY(MAP);
 
     if(nextAttack == 0 && type == TYPE::RANGED && abs(rect.x - character->getX()) <= SCREEN_WIDTH / 2)
     {
@@ -248,11 +313,41 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
         if(facing) tempRect.x -= 2 * melee.x + melee.w - rect.w;
 
         if(collision(tempRect, character->getRect())){
+            character->takeDamage(dmg);
             int chance = Rand(1, 2);
-            character->setHp(character->getHp() - dmg);
             if(chance == 1 && character->getId() == 2)
                 hp = std::max(0, hp - dmg);
         }
+    }
+
+    if(nextAttack == _attack.second - 1 && type == TYPE::BOMB && abs(rect.x - character->getX()) <= SCREEN_WIDTH / 2)
+    {
+        vExplosion.push_back({rect, prRadius, dmg, 15});
+    }
+
+    if(type == TYPE::FOLLOW)
+    {
+        if(abs(rect.x - character->getX()) <= SCREEN_WIDTH / 2)
+        {
+            if(rect.x > character->getX()) rect.x -= velX;
+            else if(rect.x < character->getX()) rect.x += velX;
+
+            if(rect.y > character->getY()) rect.y -= velY;
+            else if(rect.y < character->getY()) rect.y += velY;
+
+            inFollowRange = true;
+        }
+        else inFollowRange = false;
+        if(collision(character->getRect(), rect) && nextAttack == 0)
+            character->takeDamage(dmg);
+    }
+
+    if(type == TYPE::LASER)
+    {
+        SDL_Rect range = {rect.x + rect.w / 2, rect.y + 20, SCREEN_WIDTH, 100};
+        if(!facing) range.x -= SCREEN_WIDTH;
+        if(laserTick % 20 == 0 && collision(character->getRect(), range))
+            character->takeDamage(dmg);
     }
 }
 

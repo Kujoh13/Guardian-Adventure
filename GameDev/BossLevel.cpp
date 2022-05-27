@@ -79,10 +79,6 @@ void BossLevel::show(SDL_Renderer* renderer, AudioPlayer* audio)
     SDL_Rect nRect = {Boss.getX() + Boss.getW() - 2 * bossSize / 3, Boss.getY() + Boss.getH() - 2 * bossSize / 3, bossSize, bossSize};
     SDL_Rect tRect = {(frame % fr[nStatus].first) * bossSize, (frame / fr[nStatus].first) * bossSize, bossSize, bossSize};
 
-    SDL_Rect rect = Boss.getRect();
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_RenderDrawRect(renderer, &rect);
-
     SDL_RenderCopy(renderer, tex[nStatus], &tRect, &nRect);
     frame++;
     if(status != STATUS::DIE)

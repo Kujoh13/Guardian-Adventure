@@ -20,7 +20,7 @@ public:
     void drawMove(SDL_Renderer* renderer, int view);
     void collisionX(game_map* MAP);
     void collisionY(game_map* MAP);
-    void tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* character);
+    void tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* character, std::vector<Explosion>& vExplosion);
     void setType(int _type);
     void setWeapon(int _type);
     void setRange(int l, int r);
@@ -35,6 +35,7 @@ protected:
     SDL_Texture* idleAnimation[2];
     SDL_Texture* attackAnimation[2];
     SDL_Texture* moveAnimation[2];
+    SDL_Texture* laser;
     SDL_Rect melee;
     int frameAttack;
     bool hostile;
@@ -45,6 +46,8 @@ protected:
         MELEE = 1,
         THROW = 2,
         LASER = 3,
+        BOMB = 4,
+        FOLLOW = 5,
     };
     int weapon;
     bool idle, move, attack;
@@ -60,6 +63,8 @@ protected:
     int itemDrop[3];
     int prSpeed;
     int prRadius;
+    int laserTick;
+    bool inFollowRange;
 };
 
 #endif // MOB_H_
