@@ -168,10 +168,6 @@ void Mob::show(SDL_Renderer* renderer, int view)
     SDL_Rect nRect = rect;
     nRect.x -= view;
 
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-
-    SDL_RenderDrawRect(renderer, &nRect);
-
     if(type != TYPE::FOLLOW && type != TYPE::LASER)
     {
         if(nextAttack >= _attack.second)
