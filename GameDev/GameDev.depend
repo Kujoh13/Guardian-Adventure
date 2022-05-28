@@ -19,10 +19,10 @@
 1653491585 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\gameobject.h
 	"BasicFunction.h"
 
-1653597920 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
+1653698980 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.cpp
 	"game_map.h"
 
-1653247705 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
+1653698963 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\game_map.h
 	"BasicFunction.h"
 	"GameObject.h"
 
@@ -78,7 +78,7 @@
 1651296649 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\lp.cpp
 	"lp.h"
 
-1653587354 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\handler.h
+1653698444 e:\uni\hk2 - 1st year\int2215 2 - ltnc\gamedev\handler.h
 	"bits/stdc++.h"
 	"BasicFunction.h"
 	"GameObject.h"
@@ -118,4 +118,115 @@
 	"AudioPlayer.h"
 	<SDL_ttf.h>
 	"Item.h"
+
+1653316804 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\audioplayer.cpp
+	"AudioPlayer.h"
+
+1653300302 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\audioplayer.h
+	"BasicFunction.h"
+	<SDL_mixer.h>
+
+1653650284 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\basicfunction.h
+	<bits/stdc++.h>
+	<SDL.h>
+	<Windows.h>
+	<SDL_image.h>
+	<SDL_audio.h>
+	<SDL_ttf.h>
+
+1651245808 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\basicfunction.cpp
+	"BasicFunction.h"
+
+1653673260 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\bosslevel.cpp
+	"BossLevel.h"
+
+1653495883 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\bosslevel.h
+	"BasicFunction.h"
+	"Character.h"
+	"GameObject.h"
+	"Projectile.h"
+	"AudioPlayer.h"
+	<SDL_ttf.h>
+	"Item.h"
+
+1653494448 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\character.h
+	"GameObject.h"
+	"BasicFunction.h"
+	"game_map.h"
+	"Projectile.h"
+
+1653491585 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\gameobject.h
+	"BasicFunction.h"
+
+1653698963 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\game_map.h
+	"BasicFunction.h"
+	"GameObject.h"
+
+1651426319 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\projectile.h
+	"GameObject.h"
+	"BasicFunction.h"
+	"game_map.h"
+
+1653046587 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\item.h
+	"Character.h"
+	"BasicFunction.h"
+	"GameObject.h"
+
+1653673260 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\character.cpp
+	"Character.h"
+
+1653698980 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\game_map.cpp
+	"game_map.h"
+
+1651427355 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\gameobject.cpp
+	"GameObject.h"
+
+1653699801 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\handler.cpp
+	"Handler.h"
+
+1653698444 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\handler.h
+	"bits/stdc++.h"
+	"BasicFunction.h"
+	"GameObject.h"
+	"game_map.h"
+	"Screen.h"
+	"Character.h"
+	"Mob.h"
+	"Projectile.h"
+	"lp.h"
+	"AudioPlayer.h"
+	"BossLevel.h"
+
+1653101978 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\screen.h
+	"BasicFunction.h"
+	"GameObject.h"
+
+1653665915 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\mob.h
+	"BasicFunction.h"
+	"GameObject.h"
+	"game_map.h"
+	"Projectile.h"
+	"Character.h"
+	"Item.h"
+
+1650019187 e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\lp.h
+	"BasicFunction.h"
+	"GameObject.h"
+	"game_map.h"
+	"Item.h"
+
+1653046600 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\item.cpp
+	"Item.h"
+
+1651296649 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\lp.cpp
+	"lp.h"
+
+1653673418 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\mob.cpp
+	"Mob.h"
+
+1651757460 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\projectile.cpp
+	"Projectile.h"
+
+1653473481 source:e:\uni\hk2 - 1st year\int2215 2 - ltnc\github\guardian-adventure\gamedev\screen.cpp
+	"Screen.h"
 

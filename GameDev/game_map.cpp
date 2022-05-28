@@ -6,12 +6,12 @@ game_map::game_map()
     background = NULL;
     flag = NULL;
     castle = NULL;
-    while(Block.size()) Block.pop_back();
-    while(Bush.size()) Bush.pop_back();
+    Block.clear();
+    Decor.clear();
 
     info = NULL;
-    bush_width = NULL;
-    bush_height = NULL;
+    decor_width = NULL;
+    decor_height = NULL;
 
     victory_w = 1300;
     victory_h = 0;
@@ -30,12 +30,12 @@ game_map::~game_map()
     SDL_DestroyTexture(castle);
     castle = NULL;
 
-    delete(bush_height);
-    delete(bush_width);
+    delete(decor_height);
+    delete(decor_width);
     delete(info);
 
-    bush_height = NULL;
-    bush_width = NULL;
+    decor_height = NULL;
+    decor_width = NULL;
     info = NULL;
 
 }
@@ -80,13 +80,13 @@ int game_map::getNumBlock(int _NumBlock)
 {
     return Num_Block;
 }
-void game_map::setNumBush(int _NumBush)
+void game_map::setNumDecor(int _NumDecor)
 {
-    Num_Bush = _NumBush;
+    Num_Decor = _NumDecor;
 }
-int game_map::getNumBush(int _NumBush)
+int game_map::getNumDecor(int _NumDecor)
 {
-    return Num_Bush;
+    return Num_Decor;
 }
 
 bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
@@ -96,12 +96,12 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
     file_map >> Map_Width;
     file_map >> Map_Height;
     file_map >> Num_Block;
-    file_map >> Num_Bush;
-    bush_height = new int [Num_Bush];
-    bush_width = new int [Num_Bush];
-    for(int i = 0; i < Num_Bush; i++)
+    file_map >> Num_Decor;
+    decor_height = new int [Num_Decor];
+    decor_width = new int [Num_Decor];
+    for(int i = 0; i < Num_Decor; i++)
     {
-        file_map >> bush_width[i] >> bush_height[i];
+        file_map >> decor_width[i] >> decor_height[i];
     }
 
     file_map.close();
@@ -144,11 +144,11 @@ bool game_map::loadMap(std::string path, SDL_Renderer* renderer, int level)
         SDL_FreeSurface(loadedSurface);
     }
 
-    for(int i = 0; i < Num_Bush; i++){
+    for(int i = 0; i < Num_Decor; i++){
 
-        SDL_Surface* loadedSurface = IMG_Load((path + "/level_" + int2str(level) + "/bush_" + int2str(i) + ".png").c_str());
+        SDL_Surface* loadedSurface = IMG_Load((path + "/level_" + int2str(level) + "/decor_" + int2str(i) + ".png").c_str());
 
-        Bush.push_back(SDL_CreateTextureFromSurface(renderer, loadedSurface));
+        Decor.push_back(SDL_CreateTextureFromSurface(renderer, loadedSurface));
 
         SDL_FreeSurface(loadedSurface);
     }
@@ -250,19 +250,19 @@ void game_map::render(SDL_Renderer* renderer, int view, bool map_cleared, bool i
                 SDL_RenderCopy(renderer, Block[numGrass%(Num_Block - 1)], NULL, &rect);
             }
             else if(rgb == blue){
-                rect.w = bush_width[0] * TILE_SIZE;
-                rect.h = bush_height[0] * TILE_SIZE;
-                SDL_RenderCopy(renderer, Bush[0], NULL, &rect);
+                rect.w = decor_width[0] * TILE_SIZE;
+                rect.h = decor_height[0] * TILE_SIZE;
+                SDL_RenderCopy(renderer, Decor[0], NULL, &rect);
             }
             else if(rgb == red){
-                rect.w = bush_width[1] * TILE_SIZE;
-                rect.h = bush_height[1] * TILE_SIZE;
-                SDL_RenderCopy(renderer, Bush[1], NULL, &rect);
+                rect.w = decor_width[1] * TILE_SIZE;
+                rect.h = decor_height[1] * TILE_SIZE;
+                SDL_RenderCopy(renderer, Decor[1], NULL, &rect);
             }
             else if(rgb == cyan){
-                rect.w = bush_width[2] * TILE_SIZE;
-                rect.h = bush_height[2] * TILE_SIZE;
-                SDL_RenderCopy(renderer, Bush[2], NULL, &rect);
+                rect.w = decor_width[2] * TILE_SIZE;
+                rect.h = decor_height[2] * TILE_SIZE;
+                SDL_RenderCopy(renderer, Decor[2], NULL, &rect);
             }
             else if(rgb == yellow){
                 rect.w = 23 * TILE_SIZE;

@@ -5,7 +5,7 @@ using namespace std;
 void logSDLError(std::ostream& os,
                  const std::string &msg, bool fatal = false);
 
-const string WINDOW_TITLE = "Game SDL";
+const string WINDOW_TITLE = "Guardian Adventure";
 
 void initSDL(SDL_Window* &window, SDL_Renderer* &renderer);
 

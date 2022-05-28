@@ -59,6 +59,4 @@ protected:
     BossLevel boss;
 };
 
-
-
 #endif // HANDLER_H_

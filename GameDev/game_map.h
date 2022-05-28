@@ -13,8 +13,8 @@ public:
     void render(SDL_Renderer* renderer, int view, bool map_cleared, bool isBossLevel);
     void setNumBlock(int _NumBlock);
     int getNumBlock(int _NumBlock);
-    void setNumBush(int _NumBush);
-    int getNumBush(int _NumBush);
+    void setNumDecor(int _NumDecor);
+    int getNumDecor(int _NumDecor);
 
     void setNumCoin(int _numCoin) {numCoin = _numCoin;}
     int getNumCoin() {return numCoin;}
@@ -31,19 +31,19 @@ public:
 
 protected:
     std::vector<SDL_Texture*> Block;
-    std::vector<SDL_Texture*> Bush;
+    std::vector<SDL_Texture*> Decor;
     SDL_Surface* Map_Sheet;
     SDL_Texture* background;
     SDL_Texture* castle;
     SDL_Texture* flag;
     int Num_Block;
-    int Num_Bush;
+    int Num_Decor;
     std::vector<int> lp_pos;
     int Map_Width, Map_Height;
     int victory_w, victory_h;
     int** info;
-    int* bush_width;
-    int* bush_height;
+    int* decor_width;
+    int* decor_height;
     int numCoin, numGem;
 };
 

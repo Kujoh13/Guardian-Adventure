@@ -324,12 +324,11 @@ void Handler::tick(SDL_Renderer* renderer)
                             int chance = Rand(1, 2);
                             if(current_character != 2 || chance == 1)
                             {
-                                int curHp = _character[current_character].getHp() - vProjectile[i].getDmg();
-                                _character[current_character].setHp(curHp);
+                                _character[current_character].takeDamage(vProjectile[i].getDmg());
                             }
                             if(vProjectile[i].getThrew())
                             {
-                                vExplosion.push_back({vProjectile[i].getHitBox(), vProjectile[i].getRadius(), vProjectile[i].getDmg(), 15});
+                                vExplosion.push_back({vProjectile[i].getHitBox(), vProjectile[i].getRadius(), 0, 15});
                                 Audio_Player.bomb_explosion();
                             }
                             std::swap(vProjectile[i], vProjectile.back());
@@ -404,10 +403,9 @@ void Handler::tick(SDL_Renderer* renderer)
         rectMob.clear();
         for(int i = 0; i < vExplosion.size(); i++)
         {
-            if(distance(vExplosion[i].rect, _character[current_character].getRect()) <= vExplosion[i].radius)
+            if(distance(vExplosion[i].rect, _character[current_character].getRect()) <= vExplosion[i].radius && vExplosion[i].frame == 15)
             {
-                int curHp = _character[current_character].getHp() - vExplosion[i].dmg;
-                _character[current_character].setHp(curHp);
+                _character[current_character].takeDamage(vExplosion[i].dmg);
             }
             vExplosion[i].frame--;
         }
