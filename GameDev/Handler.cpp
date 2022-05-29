@@ -295,7 +295,7 @@ void Handler::tick(SDL_Renderer* renderer)
                vMob.pop_back();
             }
             else
-                vMob[i].tick(MAP, vProjectile, &_character[current_character], vExplosion);
+                vMob[i].tick(MAP, vProjectile, &_character[current_character], vExplosion, &Audio_Player);
         }
         if(vProjectile.size())
         {

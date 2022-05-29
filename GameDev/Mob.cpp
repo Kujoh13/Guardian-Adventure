@@ -162,12 +162,6 @@ void Mob::drawAttack(SDL_Renderer* renderer, int view)
 
 void Mob::show(SDL_Renderer* renderer, int view)
 {
-
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
-    SDL_Rect nRect = rect;
-    nRect.x -= view;
-
     if(type != TYPE::FOLLOW && type != TYPE::LASER)
     {
         if(nextAttack >= _attack.second)
@@ -229,7 +223,7 @@ void Mob::show(SDL_Renderer* renderer, int view)
     }
 }
 
-void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* character, std::vector<Explosion>& vExplosion)
+void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* character, std::vector<Explosion>& vExplosion, AudioPlayer* audio)
 {
     if(type != TYPE::FOLLOW && type != TYPE::LASER)
     {
@@ -319,6 +313,7 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
     if(nextAttack == _attack.second - 1 && type == TYPE::BOMB && abs(rect.x - character->getX()) <= SCREEN_WIDTH / 2)
     {
         vExplosion.push_back({rect, prRadius, dmg, 15});
+        audio->bomb_explosion();
     }
 
     if(type == TYPE::FOLLOW)
@@ -342,7 +337,7 @@ void Mob::tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* c
     {
         SDL_Rect range = {rect.x + rect.w / 2, rect.y + 20, SCREEN_WIDTH, 100};
         if(!facing) range.x -= SCREEN_WIDTH;
-        if(laserTick % 20 == 0 && collision(character->getRect(), range))
+        if(laserTick % 20 == 0 && laserTick < 90 && collision(character->getRect(), range))
             character->takeDamage(dmg);
     }
 }

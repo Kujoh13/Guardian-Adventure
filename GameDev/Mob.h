@@ -7,6 +7,7 @@
 #include "Projectile.h"
 #include "Character.h"
 #include "Item.h"
+#include "AudioPlayer.h"
 
 class Mob : public GameObject
 {
@@ -20,7 +21,7 @@ public:
     void drawMove(SDL_Renderer* renderer, int view);
     void collisionX(game_map* MAP);
     void collisionY(game_map* MAP);
-    void tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* character, std::vector<Explosion>& vExplosion);
+    void tick(game_map* MAP, std::vector<Projectile> &vProjectile, Character* character, std::vector<Explosion>& vExplosion, AudioPlayer* audio);
     void setType(int _type);
     void setWeapon(int _type);
     void setRange(int l, int r);
