@@ -53,6 +53,7 @@ void BossLevel::reset()
     dropHP.clear();
     for(int i = 10; i <= 90; i += 10)
         dropHP.push_back(i);
+    rRect.w = 0;
 }
 void BossLevel::show(SDL_Renderer* renderer, AudioPlayer* audio)
 {
