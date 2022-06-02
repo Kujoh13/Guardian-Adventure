@@ -215,7 +215,7 @@ void BossLevel::tick(Character* character, std::vector<Item>& vItem)
             if(collision(character->getRect(), vAttack1[i]))
             {
                 int chance = Rand(1, 2);
-                if(character->id != 2 || chance == 1)
+                if(character->getId() != 2 || chance == 1)
                 {
                     character->takeDamage(20);
                 }
@@ -243,7 +243,7 @@ void BossLevel::tick(Character* character, std::vector<Item>& vItem)
                 if(vAttack2[i].second == 0)
                 {
                     int chance = Rand(1, 2);
-                    if(character->id != 2 || chance == 1)
+                    if(character->getId() != 2 || chance == 1)
                     {
                         character->takeDamage(15);
                     }
@@ -251,7 +251,7 @@ void BossLevel::tick(Character* character, std::vector<Item>& vItem)
                 else
                 {
                     int chance = Rand(1, 2);
-                    if(character->id != 2 || chance == 1)
+                    if(character->getId() != 2 || chance == 1)
                     {
                         character->takeDamage(20);
                     }
@@ -316,7 +316,7 @@ void BossLevel::tick(Character* character, std::vector<Item>& vItem)
             else if(collision(character->getRect(), vAttack3[i].first))
             {
                 int chance = Rand(1, 2);
-                if(character->id != 2 || chance == 1)
+                if(character->getId() != 2 || chance == 1)
                 {
                     character->takeDamage(25);
                 }
