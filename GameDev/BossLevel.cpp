@@ -214,7 +214,12 @@ void BossLevel::tick(Character* character, std::vector<Item>& vItem)
         {
             if(collision(character->getRect(), vAttack1[i]))
             {
-                character->takeDamage(20);
+                int chance = Rand(1, 2);
+                if(character->id != 2 || chance == 1)
+                {
+                    character->takeDamage(20);
+                }
+
                 std::swap(vAttack1[i], vAttack1.back());
                 vAttack1.pop_back();
             }
@@ -236,9 +241,21 @@ void BossLevel::tick(Character* character, std::vector<Item>& vItem)
             if(collision(character->getRect(), vAttack2[i].first.getRect()))
             {
                 if(vAttack2[i].second == 0)
-                    character->takeDamage(15);
+                {
+                    int chance = Rand(1, 2);
+                    if(character->id != 2 || chance == 1)
+                    {
+                        character->takeDamage(15);
+                    }
+                }
                 else
-                    character->takeDamage(20);
+                {
+                    int chance = Rand(1, 2);
+                    if(character->id != 2 || chance == 1)
+                    {
+                        character->takeDamage(20);
+                    }
+                }
                 std::swap(vAttack2[i], vAttack2.back());
                 vAttack2.pop_back();
             }
@@ -298,7 +315,11 @@ void BossLevel::tick(Character* character, std::vector<Item>& vItem)
             }
             else if(collision(character->getRect(), vAttack3[i].first))
             {
-                character->takeDamage(25);
+                int chance = Rand(1, 2);
+                if(character->id != 2 || chance == 1)
+                {
+                    character->takeDamage(25);
+                }
                 std::swap(vAttack3[i], vAttack3.back());
                 vAttack3.pop_back();
             }
@@ -446,7 +467,12 @@ void BossLevel::attack4(Character* character)
             nRect.y -= 180;
             nRect.h += 180;
             if(collision(character->getRect(), nRect))
+            {
                 character->takeDamage(40);
+                int chance = Rand(1, 2);
+                if(chance == 1 && character->getId() == 2)
+                    Boss.takeDamage(40);
+            }
         }
     }
     else if(timer4 == 3)
